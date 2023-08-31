@@ -1,3 +1,4 @@
+"use client";
 import clsx from "clsx";
 
 interface props extends React.HTMLAttributes<HTMLDivElement> {
@@ -7,7 +8,7 @@ interface props extends React.HTMLAttributes<HTMLDivElement> {
 export function Container({ className, children, ...props }: props) {
   return (
     <div
-      className={clsx("mx-auto max-w-7xl px-2 sm:px-6 lg:px-8", className)}
+      className={clsx("mx-auto  max-w-7xl px-2 sm:px-6 lg:px-8", className)}
       {...props}
     >
       {children}

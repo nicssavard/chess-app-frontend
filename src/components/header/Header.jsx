@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { use } from "react";
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
 import classNames from "classnames";
 import { CaretDownIcon } from "@radix-ui/react-icons";
@@ -17,6 +17,7 @@ function getCookie(name) {
 // Usage
 
 export default function Header() {
+  console.log("Header");
   useEffect(() => {
     const token = getCookie("access_token");
     // ... rest of your code
@@ -40,8 +41,8 @@ export default function Header() {
   const { user } = useStore((state) => ({ user: state.user }));
 
   return (
-    <NavigationMenu.Root className="relative z-[1] flex w-screen justify-center mt-2">
-      <NavigationMenu.List className="center shadow-blackA7 m-0 flex list-none rounded-[6px] bg-gray-900 p-1 shadow-[0_2px_10px]">
+    <NavigationMenu.Root className="relative z-[1] flex w-screen justify-center ">
+      <NavigationMenu.List className="center shadow-blackA7 m-0 flex list-none rounded-[6px] bg-gray-900 p-1 shadow-[0_2px_10px] mt-2">
         <NavigationMenu.Item>
           <NavigationMenu.Trigger className="text-gray-400 hover:bg-violet3 focus:shadow-violet7 group flex select-none items-center justify-between gap-[2px] rounded-[4px] px-3 py-2 text-[15px] font-medium leading-none outline-none focus:shadow-[0_0_0_2px]">
             Play{" "}
@@ -50,7 +51,7 @@ export default function Header() {
               aria-hidden
             />
           </NavigationMenu.Trigger>
-          <NavigationMenu.Content className="data-[motion=from-start]:animate-enterFromLeft data-[motion=from-end]:animate-enterFromRight data-[motion=to-start]:animate-exitToLeft data-[motion=to-end]:animate-exitToRight absolute top-0 left-0 w-full sm:w-auto">
+          <NavigationMenu.Content className="bg-gray-900 data-[motion=from-start]:animate-enterFromLeft data-[motion=from-end]:animate-enterFromRight data-[motion=to-start]:animate-exitToLeft data-[motion=to-end]:animate-exitToRight absolute top-0 left-0 w-full sm:w-auto">
             <ul className="one m-0 grid list-none gap-x-[10px] p-[22px] sm:w-[500px] sm:grid-cols-[0.75fr_1fr]">
               <li className="row-span-3 grid">
                 <NavigationMenu.Link asChild>
@@ -80,8 +81,8 @@ export default function Header() {
                 </NavigationMenu.Link>
               </li>
 
-              <ListItem href="https://stitches.dev/" title="Stitches">
-                CSS-in-JS with best-in-class developer experience.
+              <ListItem href="https://stitches.dev/" title="Practice">
+                Practice chess by yourself
               </ListItem>
               <ListItem href="/colors" title="Colors">
                 Beautiful, thought-out palettes with auto dark mode.
@@ -141,14 +142,16 @@ export default function Header() {
           </NavigationMenu.Content>
         </NavigationMenu.Item>
 
-        <NavigationMenu.Item>
-          <NavigationMenu.Link
-            className="text-gray-400 hover:bg-gray-700 focus:shadow-blue-400 block select-none rounded-[4px] px-3 py-2 text-[15px] font-medium leading-none no-underline outline-none focus:shadow-[0_0_0_2px]"
-            href="/login"
-          >
-            Login
-          </NavigationMenu.Link>
-        </NavigationMenu.Item>
+        {!user && (
+          <NavigationMenu.Item>
+            <NavigationMenu.Link
+              className="text-gray-400 hover:bg-gray-700 focus:shadow-blue-400 block select-none rounded-[4px] px-3 py-2 text-[15px] font-medium leading-none no-underline outline-none focus:shadow-[0_0_0_2px]"
+              href="/login"
+            >
+              Login
+            </NavigationMenu.Link>
+          </NavigationMenu.Item>
+        )}
         {user && <AcountManager username={user.username} />}
 
         <NavigationMenu.Indicator className="data-[state=visible]:animate-fadeIn data-[state=hidden]:animate-fadeOut top-full z-[1] flex h-[10px] items-end justify-center overflow-hidden transition-[width,transform_250ms_ease]">
@@ -169,16 +172,16 @@ const ListItem = React.forwardRef(
       <NavigationMenu.Link asChild>
         <a
           className={classNames(
-            "focus:shadow-[0_0_0_2px] focus:shadow-violet7 hover:bg-mauve3 block select-none rounded-[6px] p-3 text-[15px] leading-none no-underline outline-none transition-colors",
+            "focus:shadow-[0_0_0_2px]  hover:bg-gray-700 block select-none rounded-[6px] p-3 text-[15px] leading-none no-underline outline-none transition-colors",
             className
           )}
           {...props}
           ref={forwardedRef}
         >
-          <div className="text-violet12 mb-[5px] font-medium leading-[1.2]">
+          <div className="text-gray-300 mb-[5px] font-medium leading-[1.2]">
             {title}
           </div>
-          <p className="text-mauve11 leading-[1.4]">{children}</p>
+          <p className="text-gray-400 leading-[1.4]">{children}</p>
         </a>
       </NavigationMenu.Link>
     </li>
@@ -186,14 +189,52 @@ const ListItem = React.forwardRef(
 );
 
 const AcountManager = ({ username }) => {
+  // return (
+  //   <NavigationMenu.Item>
+  //     <NavigationMenu.Link
+  //       className="text-gray-400 hover:bg-gray-700 focus:shadow-blue-400 block select-none rounded-[4px] px-3 py-2 text-[15px] font-medium leading-none no-underline outline-none focus:shadow-[0_0_0_2px]"
+  //       href="/settings"
+  //     >
+  //       {username}
+  //     </NavigationMenu.Link>
+  //   </NavigationMenu.Item>
+  // );
+  const logout = () => {
+    document.cookie =
+      "access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    useStore.setState({ user: null });
+  };
   return (
     <NavigationMenu.Item>
-      <NavigationMenu.Link
-        className="text-gray-400 hover:bg-gray-700 focus:shadow-blue-400 block select-none rounded-[4px] px-3 py-2 text-[15px] font-medium leading-none no-underline outline-none focus:shadow-[0_0_0_2px]"
-        href="/settings"
-      >
-        {username}
-      </NavigationMenu.Link>
+      <NavigationMenu.Trigger className="text-gray-400 hover:bg-gray-700  group flex select-none items-center justify-between gap-[2px] rounded-[4px] px-3 py-2 text-[15px] font-medium leading-none outline-none focus:shadow-[0_0_0_2px]">
+        {username}{" "}
+        <CaretDownIcon
+          className="text-gray-400 relative top-[1px] transition-transform duration-[250] ease-in group-data-[state=open]:-rotate-180"
+          aria-hidden
+        />
+      </NavigationMenu.Trigger>
+      <NavigationMenu.Content className="bg-gray-900 data-[motion=from-start]:animate-enterFromLeft data-[motion=from-end]:animate-enterFromRight data-[motion=to-start]:animate-exitToLeft data-[motion=to-end]:animate-exitToRight absolute top-0 left-0 w-full sm:w-auto">
+        <ul className="one m-0 grid list-none gap-x-[10px] p-[22px] sm:w-[500px] sm:grid-cols-[0.75fr_1fr]">
+          <ListItem href="https://stitches.dev/" title="Settings">
+            View your account settings
+          </ListItem>
+          <ListItem href="/test" title="Test">
+            Test area
+          </ListItem>
+          <ListItem href="/message" title="Message">
+            Chat with your friends
+          </ListItem>
+          <ListItem
+            href="/"
+            title="Logout"
+            onClick={() => {
+              logout();
+            }}
+          >
+            {/* A crisp set of 15x15 icons, balanced and consistent. */}
+          </ListItem>
+        </ul>
+      </NavigationMenu.Content>
     </NavigationMenu.Item>
   );
 };

@@ -1,44 +1,42 @@
 "use client";
-import Image from "next/image";
-import axios from "axios";
 
 export default function Home() {
-  const register = async (username: string, password: string) => {
-    axios
-      .post("http://127.0.0.1:8000/api/register/", {
-        username: username,
-        password: password,
-      })
-      .then(function (response) {
-        // handle success
-        console.log(response);
-      })
-      .catch(function (error) {
-        // handle error
-        console.log(error);
-      })
-      .finally(function () {
-        // always executed
-      });
-  };
+  // const register = async (username: string, password: string) => {
+  //   axios
+  //     .post("http://127.0.0.1:8000/api/register/", {
+  //       username: username,
+  //       password: password,
+  //     })
+  //     .then(function (response) {
+  //       // handle success
+  //       console.log(response);
+  //     })
+  //     .catch(function (error) {
+  //       // handle error
+  //       console.log(error);
+  //     })
+  //     .finally(function () {
+  //       // always executed
+  //     });
+  // };
 
-  const login = async (username: string, password: string) => {
-    axios
-      .post("http://127.0.0.1:8000/api/token/", {
-        username: username,
-        password: password,
-      })
-      .then(function (response) {
-        console.log(response);
-        axios.post;
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-  };
+  // const login = async (username: string, password: string) => {
+  //   axios
+  //     .post("http://127.0.0.1:8000/api/token/", {
+  //       username: username,
+  //       password: password,
+  //     })
+  //     .then(function (response) {
+  //       console.log(response);
+  //       axios.post;
+  //     })
+  //     .catch(function (error) {
+  //       console.log(error);
+  //     });
+  // };
   return (
     <>
-      <button onClick={() => register("test", "aaaaaaaaaaaaaa")}>
+      {/* <button onClick={() => register("test", "aaaaaaaaaaaaaa")}>
         Register
       </button>
       <button onClick={() => login("nic", "!Salocin11")}>Login</button>
@@ -148,7 +146,7 @@ export default function Home() {
             </p>
           </a>
         </div>
-      </main>
+      </main> */}
     </>
   );
 }
