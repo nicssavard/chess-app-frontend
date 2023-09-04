@@ -17,7 +17,6 @@ function getCookie(name) {
 // Usage
 
 export default function Header() {
-  console.log("Header");
   useEffect(() => {
     const token = getCookie("access_token");
     // ... rest of your code

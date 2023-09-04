@@ -40,8 +40,12 @@ export default function Test() {
   const message = () => {
     console.log("test");
     console.log(webSocket);
+    const object = {
+      type: "message",
+      content: "test",
+    };
     if (!webSocket) return;
-    webSocket.send("ping");
+    webSocket.send(JSON.stringify(object));
   };
 
   return (

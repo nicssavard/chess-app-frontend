@@ -2,10 +2,11 @@
 import { Container } from "@/components/ui/Container";
 import Chat from "./components/Chat";
 import ListUsers from "@/components/users/listUsers";
+import { useState, useEffect } from "react";
 
-import { useState } from "react";
 export default function ChatPage() {
   const [receiverID, setreceiverID] = useState<number | null>(null);
+
   const selectChat = (user: User) => {
     setreceiverID(user.id);
   };

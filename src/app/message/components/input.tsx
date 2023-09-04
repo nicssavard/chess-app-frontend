@@ -5,28 +5,37 @@ import axios from "axios";
 interface Props {
   chat: Chat;
   userID: number;
+  sendMessage: (message: string) => void;
 }
 
-export default function Input({ chat, userID }: Props) {
+export default function Input({ chat, userID, sendMessage }: Props) {
   const messageRef = useRef<HTMLTextAreaElement>(null);
   console.log(chat);
-  const sendMessage = (e: { preventDefault: () => void }) => {
+
+  const handleNewMessage = (e: { preventDefault: () => void }) => {
     e.preventDefault();
-    const data = {
-      chat: chat.id, // Replace with the actual Chat ID
-      sender: userID, // Replace with the actual User ID (sender)
-      content: messageRef.current?.value,
-    };
-    axios
-      .post("http://127.0.0.1:8000/api/messages/", data)
-      .then((response) => {
-        console.log(response);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    if (!messageRef.current?.value) return;
+    sendMessage(messageRef.current?.value);
     messageRef.current!.value = "";
   };
+
+  // const sendMessage = (e: { preventDefault: () => void }) => {
+  //   e.preventDefault();
+  //   const data = {
+  //     chat: chat.id, // Replace with the actual Chat ID
+  //     sender: userID, // Replace with the actual User ID (sender)
+  //     content: messageRef.current?.value,
+  //   };
+  //   axios
+  //     .post("http://127.0.0.1:8000/api/messages/", data)
+  //     .then((response) => {
+  //       console.log(response);
+  //     })
+  //     .catch((error) => {
+  //       console.log(error);
+  //     });
+  //   messageRef.current!.value = "";
+  // };
 
   const autoResize = (e: any) => {
     /* eslint-disable-next-line */
@@ -37,7 +46,7 @@ export default function Input({ chat, userID }: Props) {
     <div className=" mx-auto w-2/3 my-5 ">
       <form
         className="flex flex-row rounded-lg bg-gray-600"
-        onSubmit={sendMessage}
+        onSubmit={(e) => handleNewMessage(e)}
       >
         <textarea
           ref={messageRef}
