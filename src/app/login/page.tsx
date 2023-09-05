@@ -34,8 +34,10 @@ export default function Login() {
         console.log(response);
         const user = response.data.user;
         const token = response.data.access;
+        const refreshToken = response.data.refresh;
         useStore.getState().setUser(user, token);
         document.cookie = `access_token=${token}`;
+        document.cookie = `refresh_token=${refreshToken}`;
         axios.post;
         router.push("/");
       })

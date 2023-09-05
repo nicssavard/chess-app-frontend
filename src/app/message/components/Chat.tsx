@@ -114,7 +114,7 @@ const ChatList = ({ chat, userID }: ChatListProps) => {
   return (
     <>
       {chat.messages.map((message) => {
-        return <Message message={message} userId={userID} />;
+        return <Message message={message} userId={userID} key={message.id} />;
       })}
     </>
   );

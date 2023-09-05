@@ -4,8 +4,10 @@ import * as NavigationMenu from "@radix-ui/react-navigation-menu";
 import classNames from "classnames";
 import { CaretDownIcon } from "@radix-ui/react-icons";
 import useStore from "@/store/userStore";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
+import Link from "next/link";
+import { set } from "react-hook-form";
 
 function getCookie(name) {
   const value = `; ${document.cookie}`;
@@ -17,26 +19,65 @@ function getCookie(name) {
 // Usage
 
 export default function Header() {
+  const [token, setToken] = useState();
   useEffect(() => {
-    const token = getCookie("access_token");
-    // ... rest of your code
-    console.log(token);
-    axios
-      .get("http://127.0.0.1:8000/api/get_user_from_token/", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((response) => {
-        // Process the response data
-        const user = { ...response.data.user, token };
-        useStore.setState({ user: user });
-      })
-      .catch((error) => {
-        // Handle errors
-        console.log("Error:", error);
-      });
+    setToken(getCookie("access_token"));
   }, []);
+
+  useEffect(() => {
+    const get_user_from_token = async () => {
+      var validUser = null;
+      await axios
+        .get("http://127.0.0.1:8000/api/get_user_from_token/", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((response) => {
+          // Process the response data
+          const user = { ...response.data.user, token };
+          useStore.setState({ user: user });
+          validUser = true;
+        })
+        .catch((error) => {
+          console.log(error.response);
+          // Handle errors
+          if (error.response.status === 401) {
+          }
+
+          console.log("Error:", error);
+        });
+      return validUser;
+    };
+    const refresh_token = async () => {
+      const refresh_token = getCookie("refresh_token");
+      axios
+        .post("http://127.0.0.1:8000/api/token/refresh/", {
+          refresh: refresh_token,
+        })
+        .then((response) => {
+          // Process the response data
+          const access_token = response.data.access;
+          document.cookie = `access_token=${access_token}; path=/;`;
+          setToken(access_token);
+        })
+        .catch((error) => {
+          // Handle errors
+          console.log("Error:", error);
+        });
+    };
+
+    const getUser = async () => {
+      if (token) {
+        const user = await get_user_from_token();
+        if (!user) {
+          refresh_token();
+          get_user_from_token();
+        }
+      }
+    };
+    getUser();
+  }, [token]);
   const { user } = useStore((state) => ({ user: state.user }));
 
   return (
@@ -169,7 +210,7 @@ const ListItem = React.forwardRef(
   ({ className, children, title, ...props }, forwardedRef) => (
     <li>
       <NavigationMenu.Link asChild>
-        <a
+        <Link
           className={classNames(
             "focus:shadow-[0_0_0_2px]  hover:bg-gray-700 block select-none rounded-[6px] p-3 text-[15px] leading-none no-underline outline-none transition-colors",
             className
@@ -181,7 +222,7 @@ const ListItem = React.forwardRef(
             {title}
           </div>
           <p className="text-gray-400 leading-[1.4]">{children}</p>
-        </a>
+        </Link>
       </NavigationMenu.Link>
     </li>
   )
