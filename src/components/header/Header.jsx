@@ -121,7 +121,7 @@ export default function Header() {
                 </NavigationMenu.Link>
               </li>
 
-              <ListItem href="https://stitches.dev/" title="Practice">
+              <ListItem href="/chess/practice" title="Practice">
                 Practice chess by yourself
               </ListItem>
               <ListItem href="/colors" title="Colors">

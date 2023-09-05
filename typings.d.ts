@@ -18,3 +18,12 @@ type Message = {
   content: string;
   timestamp: string;
 };
+
+type ChessPosition = {
+  x: number;
+  y: number;
+};
+
+type Chesspiece = Pawn | Rook | Knight | Bishop | Queen | King | null;
+
+type Chessboard = Chesspiece[][];
