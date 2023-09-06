@@ -3,54 +3,14 @@ import { Container } from "@/components/ui/Container";
 import { useState, useEffect } from "react";
 
 export default function Test() {
-  const [webSocket, setWebSocket] = useState<WebSocket | null>(null);
-
-  useEffect(() => {
-    // Initialize WebSocket connection
-    const ws = new WebSocket("ws://127.0.0.1:8000/chat");
-    setWebSocket(ws);
-
-    return () => {
-      ws.close();
-    };
-  }, []);
-
-  useEffect(() => {
-    if (webSocket) {
-      webSocket.onopen = (e) => {
-        console.log("WebSocket connection opened", e);
-      };
-
-      webSocket.onmessage = (e) => {
-        console.log(e);
-        //const data = JSON.parse(e.data);
-        console.log(`Message received: ${e.data}`);
-      };
-
-      webSocket.onclose = (e) => {
-        console.log("WebSocket connection closed", e);
-      };
-
-      webSocket.onerror = (e) => {
-        console.error("WebSocket error", e);
-      };
-    }
-  }, [webSocket]);
-
-  const message = () => {
-    console.log("test");
-    console.log(webSocket);
-    const object = {
-      type: "message",
-      content: "test",
-    };
-    if (!webSocket) return;
-    webSocket.send(JSON.stringify(object));
-  };
-
   return (
     <Container>
-      <div onClick={message}>test</div>
+      <div className="bg-red-300 w-56 h-56 mt-5 rounded-xl relative overflow-hidden">
+        <div className="flex flex-col h-full">
+          <div className="bg-blue-600 w-56 flex-1"></div>
+          <div className="bg-blue-300 w-56 flex-1"></div>
+        </div>
+      </div>
     </Container>
   );
 }

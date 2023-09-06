@@ -14,6 +14,7 @@ const idToLocation = (id: UniqueIdentifier): ChessPosition => {
   return { x, y };
 };
 export default function ChessGame() {
+  //TODO Castling and pawn promotion other than queen
   const [board, setBoard] = useState<Chessboard>(initialBoard.board); //board[1]![0] is the white pawn   board[6]![0] is the black pawn
   const [turn, setTurn] = useState<"white" | "black">("white");
   const [isCheck, setIsCheck] = useState<boolean>(false);
@@ -53,7 +54,7 @@ export default function ChessGame() {
       setWin(initialBoard.winner);
     }
     setIsCheckMate(initialBoard.checkmate);
-    console.log(initialBoard);
+    console.log(initialBoard.getFEN());
   };
 
   return (
@@ -62,15 +63,49 @@ export default function ChessGame() {
         <span className="flex flex-col justify-center text-4xl">
           {isCheckMate && <span>{win} won</span>}
           {isCheck && !isCheckMate && <span>Check</span>}
-          {!isCheck && !isCheckMate && <span>{turn}</span>}
+          {/* {!isCheck && !isCheckMate && <span>{turn}</span>} */}
         </span>
       </div>
-
-      <DndContext onDragEnd={handleDragEnd}>
-        <div className="flex flex-col rounded-2xl">
-          <ChessBoard board={board} />
+      <div className="flex flex-row justify-center">
+        <div className="flex flex-col justify-end w-10">
+          {initialBoard.deadPieces
+            .filter((p) => p.color === "white")
+            .map((piece) => {
+              return (
+                <img
+                  src={`/chessPieces/${piece.color}${piece.type}.png`}
+                  alt={`/chessPieces/${piece.color}${piece.type}.png`}
+                  className="h-10 w-10 shrink"
+                  key={piece.id}
+                />
+              );
+            })}
         </div>
-      </DndContext>
+        <DndContext onDragEnd={handleDragEnd}>
+          <div className="flex flex-col">
+            <ChessBoard
+              board={board}
+              className={`rounded-2xl relative overflow-hidden border-4 ${
+                turn === "white" ? "border-white" : "border-black"
+              }`}
+            />
+          </div>
+        </DndContext>
+        <div className="flex flex-col justify-start w-10 overflow-hidden">
+          {initialBoard.deadPieces
+            .filter((p) => p.color === "black")
+            .map((piece) => {
+              return (
+                <img
+                  src={`/chessPieces/${piece.color}${piece.type}.png`}
+                  alt={`/chessPieces/${piece.color}${piece.type}.png`}
+                  className="h-10 w-10"
+                  key={piece.id}
+                />
+              );
+            })}
+        </div>
+      </div>
     </>
   );
 }

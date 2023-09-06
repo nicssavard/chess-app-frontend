@@ -14,12 +14,13 @@ import Square from "./Square";
 
 interface Props {
   board: Chessboard;
+  className?: string;
 }
 
-export function ChessBoard({ board }: Props) {
+export function ChessBoard({ board, className }: Props) {
   const boardDisplayed = board.map((row, i) => {
     return (
-      <div key={i} className="flex flex-row justify-center">
+      <div key={i} className="flex flex-row justify-center ">
         {row.map((piece: Chesspiece, j) => {
           return (
             <Square
@@ -34,7 +35,9 @@ export function ChessBoard({ board }: Props) {
     );
   });
 
-  return <div className="flex flex-col-reverse">{boardDisplayed}</div>;
+  return (
+    <div className={`flex flex-col-reverse ${className}`}>{boardDisplayed}</div>
+  );
 }
 
 export class chessBoard {
@@ -211,6 +214,56 @@ export class chessBoard {
 
   public getBoard(): Chessboard {
     return this.board;
+  }
+
+  public getFEN(): string {
+    let fen = "";
+    for (let i = 0; i < 8; i++) {
+      let emptyCount = 0;
+      for (let j = 0; j < 8; j++) {
+        const piece = this.board[i][j];
+        if (piece) {
+          if (emptyCount > 0) {
+            fen += emptyCount;
+            emptyCount = 0;
+          }
+          switch (piece.constructor.name) {
+            case "Pawn":
+              fen += piece.color === "white" ? "P" : "p";
+              break;
+            case "Rook":
+              fen += piece.color === "white" ? "R" : "r";
+              break;
+            case "Knight":
+              fen += piece.color === "white" ? "N" : "n";
+              break;
+            case "Bishop":
+              fen += piece.color === "white" ? "B" : "b";
+              break;
+            case "Queen":
+              fen += piece.color === "white" ? "Q" : "q";
+              break;
+            case "King":
+              fen += piece.color === "white" ? "K" : "k";
+              break;
+            default:
+              break;
+          }
+        } else {
+          emptyCount++;
+        }
+      }
+      if (emptyCount > 0) {
+        fen += emptyCount;
+      }
+      if (i !== 7) {
+        fen += "/";
+      }
+    }
+    fen += ` ${this.turn === "white" ? "w" : "b"} `;
+    // TODO: Implement castling, en passant, halfmove clock, and fullmove number.
+    // For now, I'm just returning the basic position and turn information.
+    return fen;
   }
 
   public movePiece(
