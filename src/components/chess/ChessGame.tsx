@@ -53,7 +53,9 @@ export default function ChessGame() {
       setWin(initialBoard.winner);
     }
     setIsCheckMate(initialBoard.checkmate);
+    console.log(initialBoard);
   };
+
   return (
     <>
       <div className="flex h-20 flex-row justify-center ">

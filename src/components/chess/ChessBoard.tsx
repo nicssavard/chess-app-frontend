@@ -1,4 +1,6 @@
 // import { ChessPosition, Chessboard, Chesspiece } from "../../../typings";
+import _ from "lodash";
+
 import {
   Pawn,
   Rook,
@@ -79,7 +81,6 @@ export class chessBoard {
 
   private constructor() {
     // Private constructor to prevent instantiation from outside
-    console.log("constructor");
     // this.wPawn1 = new Pawn("white");
     this.board = Array.from({ length: 8 }, () =>
       Array<Chesspiece>(8).fill(null)
@@ -225,6 +226,23 @@ export class chessBoard {
     if (piece === null || piece === undefined) {
       return false;
     }
+    if (this.pawnPromotion(piece, end)) {
+      this.board[start.x]![start.y] = null;
+      const newBoard: Chessboard = this.board.map((row) =>
+        row.slice()
+      ) as Chessboard;
+      this.turn = this.turn === "white" ? "black" : "white";
+      if (this.isCheck(this.turn)) {
+        this.setCheck(true);
+        if (this.isCheckmate(this.turn)) {
+          this.checkmate = true;
+          this.winner = this.turn === "white" ? "black" : "white";
+        }
+      } else {
+        this.setCheck(false);
+      }
+      return newBoard;
+    }
     //check if the move would put his own king in check
     this.board[end.x]![end.y] = piece;
     const nullPiece = this.board[end.x]![end.y];
@@ -252,7 +270,6 @@ export class chessBoard {
     this.turn = this.turn === "white" ? "black" : "white";
     if (this.isCheck(this.turn)) {
       this.setCheck(true);
-      console.log("check");
       if (this.isCheckmate(this.turn)) {
         this.checkmate = true;
         this.winner = this.turn === "white" ? "black" : "white";
@@ -282,6 +299,24 @@ export class chessBoard {
     if (deadPiece === null || deadPiece === undefined) {
       return false;
     }
+    if (this.pawnPromotion(piece, end)) {
+      this.board[start.x]![start.y] = null;
+      this.deadPieces.push(deadPiece);
+      const newBoard: Chessboard = this.board.map((row) =>
+        row.slice()
+      ) as Chessboard;
+      this.turn = this.turn === "white" ? "black" : "white";
+      if (this.isCheck(this.turn)) {
+        this.setCheck(true);
+        if (this.isCheckmate(this.turn)) {
+          this.checkmate = true;
+          this.winner = this.turn === "white" ? "black" : "white";
+        }
+      } else {
+        this.setCheck(false);
+      }
+      return newBoard;
+    }
     //check if the move would put his own king in check
     const nullPiece = this.board[end.x]![end.y];
     this.board[end.x]![end.y] = piece;
@@ -310,16 +345,54 @@ export class chessBoard {
     this.turn = this.turn === "white" ? "black" : "white";
     if (this.isCheck(this.turn)) {
       this.setCheck(true);
-      console.log("check");
       if (this.isCheckmate(this.turn)) {
         this.checkmate = true;
         this.winner = this.turn === "white" ? "black" : "white";
       }
-      console.log(this.checkmate);
     } else {
       this.setCheck(false);
     }
     return newBoard; // Return the new copy
+  }
+
+  pawnPromotion(piece: Chesspiece, end: ChessPosition): boolean {
+    if (piece.type !== "Pawn") {
+      return false;
+    }
+
+    if (piece.color === "white" && end.x === 7) {
+      this.board[end.x]![end.y] = new Queen("white", end);
+      return true;
+    }
+    if (piece.color === "black" && end.x === 0) {
+      this.board[end.x]![end.y] = new Queen("black", end);
+      return true;
+    }
+    return false;
+  }
+  testValidMoveForCheck(end: ChessPosition, start: ChessPosition): boolean {
+    const chessBoardCopy = _.cloneDeep(this);
+
+    const piece = chessBoardCopy.board[start.x]![start.y];
+    const attackedPiece = chessBoardCopy.board[end.x]![end.y];
+    if (piece?.color !== this.turn) {
+      return false;
+    }
+    if (piece === null || piece === undefined) {
+      return false;
+    }
+
+    if (attackedPiece && attackedPiece.type === "King") {
+      return false;
+    }
+
+    chessBoardCopy.board[end.x]![end.y] = piece;
+    chessBoardCopy.board[start.x]![start.y] = null;
+    piece.setCoords(end);
+    if (chessBoardCopy.isCheck(this.turn)) {
+      return false;
+    }
+    return true;
   }
   isCheck(color: "white" | "black" = "white"): boolean {
     const flatBoard = this.board.flat();
@@ -360,11 +433,17 @@ export class chessBoard {
         for (let y = 0; y < 8; y++) {
           const start = piece.position;
           const end = { x, y };
-
           if (
             piece.isMoveValid(start, end) ||
             piece.isAttackValid(start, end)
           ) {
+            // console.log("valid move");
+            // console.log(piece);
+            // console.log(start);
+            // console.log(end);
+            if (this.testValidMoveForCheck(end, start)) {
+              return false;
+            }
             if (!this.isCheck(color)) {
               return false;
             }

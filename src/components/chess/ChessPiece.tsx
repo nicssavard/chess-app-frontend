@@ -374,6 +374,9 @@ export class King extends chessPiece {
 
   isMoveValid(start: { x: number; y: number }, end: { x: number; y: number }) {
     if (this.hasMoved(start, end) === false) return false;
+    if (this.color === this.board.board[end.x]![end.y]?.color) {
+      return false;
+    }
     if (Math.abs(start.x - end.x) > 1 || Math.abs(start.y - end.y) > 1) {
       //check if king is moving more than 1 space
       return false;
@@ -384,6 +387,9 @@ export class King extends chessPiece {
     start: { x: number; y: number },
     end: { x: number; y: number }
   ) {
+    if (this.color === this.board.board[end.x]![end.y]?.color) {
+      return false;
+    }
     if (
       this.isMoveValid(start, end) &&
       this.board.board[end.x]![end.y] !== null
