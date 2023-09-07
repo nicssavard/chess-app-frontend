@@ -3,6 +3,7 @@ import useStore from "@/store/userStore";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Input from "./input";
+import { Chat, Message } from "../../../../typings";
 
 interface Props {
   receiverID: number;

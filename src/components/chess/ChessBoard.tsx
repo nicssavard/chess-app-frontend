@@ -147,22 +147,22 @@ export class ChessBoard {
           }
           switch (piece.constructor.name) {
             case "Pawn":
-              fen += piece.color === "white" ? "P" : "p";
+              fen += piece.getColor() === "white" ? "P" : "p";
               break;
             case "Rook":
-              fen += piece.color === "white" ? "R" : "r";
+              fen += piece.getColor() === "white" ? "R" : "r";
               break;
             case "Knight":
-              fen += piece.color === "white" ? "N" : "n";
+              fen += piece.getColor() === "white" ? "N" : "n";
               break;
             case "Bishop":
-              fen += piece.color === "white" ? "B" : "b";
+              fen += piece.getColor() === "white" ? "B" : "b";
               break;
             case "Queen":
-              fen += piece.color === "white" ? "Q" : "q";
+              fen += piece.getColor() === "white" ? "Q" : "q";
               break;
             case "King":
-              fen += piece.color === "white" ? "K" : "k";
+              fen += piece.getColor() === "white" ? "K" : "k";
               break;
             default:
               break;
@@ -186,7 +186,7 @@ export class ChessBoard {
   public move(start: ChessPosition, end: ChessPosition): false | Chessboard {
     const piece = this.getPieceAtPosition(start);
     if (!piece) return false;
-    if (piece.color !== this.turn) return false;
+    if (piece.getColor() !== this.turn) return false;
     if (!piece.move(end)) return false;
     if (!this.testMoveForCheck(piece, end)) return false;
     this.makeMove(start, end);
@@ -210,7 +210,7 @@ export class ChessBoard {
   public makeMove(start: ChessPosition, end: ChessPosition): void {
     let piece = this.getPieceAtPosition(start);
     if (piece?.type === "Pawn" && this.pawnPromotion(piece, end)) {
-      piece = new Queen(piece.color, end, this);
+      piece = new Queen(piece.getColor(), end, this);
     }
     const deadPiece = this.getPieceAtPosition(end);
     if (deadPiece) {
@@ -230,7 +230,7 @@ export class ChessBoard {
   testMoveForCheck(piece: Chesspiece, end: ChessPosition): boolean {
     const chessBoardCopy = _.cloneDeep(this);
     const attackedPiece = chessBoardCopy.board[end.y]![end.x];
-    if (piece?.color !== this.turn) {
+    if (piece?.getColor() !== this.turn) {
       return false;
     }
     if (piece === null || piece === undefined) {
@@ -240,7 +240,7 @@ export class ChessBoard {
     if (attackedPiece && attackedPiece.type === "King") {
       return false;
     }
-    chessBoardCopy.makeMove(piece.position, end);
+    chessBoardCopy.makeMove(piece.getPosition(), end);
     // chessBoardCopy.board[end.x]![end.y] = piece;
     // chessBoardCopy.board[start.x]![start.y] = null;
     // piece.setPosition(end);
@@ -252,18 +252,18 @@ export class ChessBoard {
   isCheck(color: "white" | "black" = "white"): boolean {
     const flatBoard = this.board.flat();
     const king = flatBoard.filter(
-      (p) => p?.type === "King" && p?.color === color
+      (p) => p?.type === "King" && p?.getColor() === color
     )[0];
     let isCheck = false;
     const pieces = flatBoard.filter((p) => {
       return (
         p !== null &&
         p !== undefined &&
-        p.color === (color === "white" ? "black" : "white")
+        p.getColor() === (color === "white" ? "black" : "white")
       );
     });
     pieces.forEach((p) => {
-      if (p?.move(king!.position)) {
+      if (p?.move(king!.getPosition())) {
         isCheck = true;
       }
     });
@@ -277,7 +277,9 @@ export class ChessBoard {
     }
 
     // Iterate through all of the player's pieces
-    for (const piece of this.alivePieces.filter((p) => p?.color === color)) {
+    for (const piece of this.alivePieces.filter(
+      (p) => p?.getColor() === color
+    )) {
       if (piece === null || piece === undefined) {
         return false;
       }
@@ -305,11 +307,11 @@ export class ChessBoard {
       return false;
     }
 
-    if (piece.color === "white" && end.y === 7) {
+    if (piece.getColor() === "white" && end.y === 7) {
       this.board[end.y]![end.x] = new Queen("white", end, this);
       return true;
     }
-    if (piece.color === "black" && end.y === 0) {
+    if (piece.getColor() === "black" && end.y === 0) {
       this.board[end.y]![end.x] = new Queen("black", end, this);
       return true;
     }

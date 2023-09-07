@@ -2,13 +2,21 @@ import { ChessPosition } from "../../../typings";
 import { ChessBoard } from "./ChessBoard";
 
 export class Chesspiece {
-  color: string;
-  position: ChessPosition;
+  private color: string;
+  private position: ChessPosition;
   board: ChessBoard;
   constructor(color: string, position: ChessPosition, board: ChessBoard) {
     this.color = color;
     this.position = position;
     this.board = board;
+  }
+
+  public getColor(): string {
+    return this.color;
+  }
+
+  public getPosition(): ChessPosition {
+    return this.position;
   }
 
   public move(end: ChessPosition): boolean {
@@ -127,42 +135,42 @@ export class Pawn extends Chesspiece {
   }
 
   canMove(end: ChessPosition): boolean {
-    if (this.position.x !== end.x) return false; //check if pawn is moving sideways
+    if (this.getPosition().x !== end.x) return false; //check if pawn is moving sideways
 
-    if (this.color === "white") {
-      if (this.position.y === 1 && end.y === 3) {
+    if (this.getColor() === "white") {
+      if (this.getPosition().y === 1 && end.y === 3) {
         //check if pawn is moving 2 spaces
-        if (this.lineClear(this.position, end) === false) {
+        if (this.lineClear(this.getPosition(), end) === false) {
           //check if there is a piece in the way
           return false;
         }
-      } else if (this.position.y - end.y !== -1) {
+      } else if (this.getPosition().y - end.y !== -1) {
         return false;
       }
-    } else if (this.color === "black") {
-      if (this.position.y === 6 && end.y === 4) {
+    } else if (this.getColor() === "black") {
+      if (this.getPosition().y === 6 && end.y === 4) {
         //check if pawn is moving 2 spaces
-        if (this.lineClear(this.position, end) === false) {
+        if (this.lineClear(this.getPosition(), end) === false) {
           return false;
         }
-      } else if (this.position.y - end.y !== 1) {
+      } else if (this.getPosition().y - end.y !== 1) {
         return false;
       }
     }
     return true;
   }
   canAttack(end: ChessPosition): boolean {
-    if (this.color === "white") {
+    if (this.getColor() === "white") {
       if (
-        this.position.y - end.y === -1 &&
-        Math.abs(this.position.x - end.x) === 1
+        this.getPosition().y - end.y === -1 &&
+        Math.abs(this.getPosition().x - end.x) === 1
       ) {
         return true;
       }
-    } else if (this.color === "black") {
+    } else if (this.getColor() === "black") {
       if (
-        this.position.y - end.y === 1 &&
-        Math.abs(this.position.x - end.x) === 1
+        this.getPosition().y - end.y === 1 &&
+        Math.abs(this.getPosition().x - end.x) === 1
       ) {
         return true;
       }
@@ -187,8 +195,8 @@ export class Rook extends Chesspiece {
   }
 
   canMove(end: ChessPosition): boolean {
-    if (this.isLinear(this.position, end) === false) return false;
-    if (this.lineClear(this.position, end) === false) return false;
+    if (this.isLinear(this.getPosition(), end) === false) return false;
+    if (this.lineClear(this.getPosition(), end) === false) return false;
     return true;
   }
 }
@@ -209,10 +217,10 @@ export class Knight extends Chesspiece {
   canMove(end: ChessPosition): boolean {
     if (
       !(
-        (Math.abs(this.position.x - end.x) === 1 &&
-          Math.abs(this.position.y - end.y) === 2) ||
-        (Math.abs(this.position.x - end.x) === 2 &&
-          Math.abs(this.position.y - end.y) === 1)
+        (Math.abs(this.getPosition().x - end.x) === 1 &&
+          Math.abs(this.getPosition().y - end.y) === 2) ||
+        (Math.abs(this.getPosition().x - end.x) === 2 &&
+          Math.abs(this.getPosition().y - end.y) === 1)
       )
     ) {
       //check if knight is moving in an L shape
@@ -236,8 +244,8 @@ export class Bishop extends Chesspiece {
     return true;
   }
   canMove(end: ChessPosition): boolean {
-    if (this.isDiagonal(this.position, end) === false) return false;
-    if (this.DiagonalClear(this.position, end) === false) return false;
+    if (this.isDiagonal(this.getPosition(), end) === false) return false;
+    if (this.DiagonalClear(this.getPosition(), end) === false) return false;
     return true;
   }
 }
@@ -256,10 +264,10 @@ export class Queen extends Chesspiece {
     return true;
   }
   canMove(end: ChessPosition): boolean {
-    if (this.isLinear(this.position, end) === false) {
-      if (this.isDiagonal(this.position, end) === false) return false;
-      if (this.DiagonalClear(this.position, end) === false) return false;
-    } else if (this.lineClear(this.position, end) === false) return false;
+    if (this.isLinear(this.getPosition(), end) === false) {
+      if (this.isDiagonal(this.getPosition(), end) === false) return false;
+      if (this.DiagonalClear(this.getPosition(), end) === false) return false;
+    } else if (this.lineClear(this.getPosition(), end) === false) return false;
     return true;
   }
 }
@@ -279,8 +287,8 @@ export class King extends Chesspiece {
   }
   canMove(end: ChessPosition): boolean {
     if (
-      Math.abs(this.position.x - end.x) > 1 ||
-      Math.abs(this.position.y - end.y) > 1
+      Math.abs(this.getPosition().x - end.x) > 1 ||
+      Math.abs(this.getPosition().y - end.y) > 1
     ) {
       //check if king is moving more than 1 space
       return false;
