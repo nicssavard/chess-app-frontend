@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { DndContext, DragEndEvent, UniqueIdentifier } from "@dnd-kit/core";
 import Board from "./Board";
-import { ChessBoard } from "@/components/chess1/ChessBoard";
+import { ChessBoard } from "@/components/chess/ChessBoard";
 import { ChessPosition, Chessboard } from "../../../../../typings";
 import _, { set } from "lodash";
 
@@ -45,36 +45,6 @@ export default function Game() {
       setWin(chessBoard.winner);
     }
     setIsCheckMate(chessBoard.checkmate);
-    //console.log(newBoard);
-    // if (
-    //   start.x === undefined ||
-    //   start.y === undefined ||
-    //   end.x === undefined ||
-    //   end.y === undefined
-    // ) {
-    //   return;
-    // }
-    // // eslint-disable-next-line
-    // const pieceMoved = board[start.y]![start.x]; //coordinate system is flipped
-    // if (!pieceMoved) return;
-    // const boardStart = { x: start.y, y: start.x };
-    // const boardEnd = { x: end.y, y: end.x };
-    // // eslint-disable-next-line
-    // const newBoard = pieceMoved.move(boardStart, boardEnd);
-    // // Create a new copy of the board, then modify the copy
-    // // Update the staxxte with the modified copy
-    // if (!newBoard) {
-    //   return false;
-    // }
-    // // eslint-disable-next-line
-    // setBoard(newBoard);
-    // setTurn(initialBoard.turn);
-    // setIsCheck(initialBoard.check);
-    // if (initialBoard.checkmate) {
-    //   setWin(initialBoard.winner);
-    // }
-    // setIsCheckMate(initialBoard.checkmate);
-    // console.log(initialBoard.getFEN());
   };
 
   return (

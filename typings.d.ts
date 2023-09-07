@@ -5,7 +5,7 @@ import {
   Bishop,
   Queen,
   King,
-} from "./src/components/chess1/ChessPiece";
+} from "./src/components/chess/ChessPiece";
 
 type User = {
   id: number;

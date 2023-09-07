@@ -1,7 +1,7 @@
 "use client";
 import { Container } from "@/components/ui/Container";
 import { useState, useEffect } from "react";
-import { ChessBoard } from "@/components/chess1/ChessBoard";
+import { ChessBoard } from "@/components/chess/ChessBoard";
 
 export default function Test() {
   const board = new ChessBoard();
