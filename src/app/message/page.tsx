@@ -3,6 +3,7 @@ import { Container } from "@/components/ui/Container";
 import Chat from "./components/Chat";
 import ListUsers from "@/components/users/listUsers";
 import { useState, useEffect } from "react";
+import { User } from "../../../typings";
 
 export default function ChatPage() {
   const [receiverID, setreceiverID] = useState<number | null>(null);

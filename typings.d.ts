@@ -1,3 +1,12 @@
+import {
+  Pawn,
+  Rook,
+  Knight,
+  Bishop,
+  Queen,
+  King,
+} from "./src/components/chess1/ChessPiece";
+
 type User = {
   id: number;
   username: string;

@@ -105,6 +105,7 @@ export default function Header() {
                       src="/noble_chess.png"
                       width={256}
                       height={256}
+                      alt="Chess"
                     />
                   </a>
                 </NavigationMenu.Link>

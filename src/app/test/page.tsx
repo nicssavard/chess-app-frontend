@@ -1,16 +1,13 @@
 "use client";
 import { Container } from "@/components/ui/Container";
 import { useState, useEffect } from "react";
+import { ChessBoard } from "@/components/chess1/ChessBoard";
 
 export default function Test() {
+  const board = new ChessBoard();
   return (
     <Container>
-      <div className="bg-red-300 w-56 h-56 mt-5 rounded-xl relative overflow-hidden">
-        <div className="flex flex-col h-full">
-          <div className="bg-blue-600 w-56 flex-1"></div>
-          <div className="bg-blue-300 w-56 flex-1"></div>
-        </div>
-      </div>
+      <h1>Test</h1>
     </Container>
   );
 }
