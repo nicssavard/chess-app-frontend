@@ -1,6 +1,7 @@
 "use client";
 import { useRef } from "react";
 import axios from "axios";
+import { Chat } from "../../../../typings";
 
 interface Props {
   chat: Chat;

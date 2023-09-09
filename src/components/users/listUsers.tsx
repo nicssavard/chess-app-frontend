@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, use } from "react";
 import axios from "axios";
+import { User } from "../../../typings";
 
 interface Props {
   selectChat: (user: User) => void;

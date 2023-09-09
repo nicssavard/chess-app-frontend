@@ -195,7 +195,6 @@ export default function Header() {
     </NavigationMenu.Root>
   );
 }
-
 const ListItem = React.forwardRef(
   ({ className, children, title, ...props }, forwardedRef) => (
     <li>
@@ -217,6 +216,7 @@ const ListItem = React.forwardRef(
     </li>
   )
 );
+ListItem.displayName = "ListItem";
 
 const AcountManager = ({ username }) => {
   const logout = () => {
