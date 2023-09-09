@@ -1,12 +1,27 @@
 import { useDroppable } from "@dnd-kit/core";
 import { Piece } from "./Piece";
-import { ChessPosition, Chesspiece } from "../../../../../typings";
+import { ChessPosition, Chesspiece } from "../../../../typings";
 
 interface Props {
-  chessPiece: Chesspiece | null;
+  chessPiece: string | null;
   position: ChessPosition;
   id: string;
 }
+
+const pieceMap: { [key: string]: string } = {
+  p: "blackPawn",
+  r: "blackRook",
+  n: "blackKnight",
+  b: "blackBishop",
+  q: "blackQueen",
+  k: "blackKing",
+  P: "whitePawn",
+  R: "whiteRook",
+  N: "whiteKnight",
+  B: "whiteBishop",
+  Q: "whiteQueen",
+  K: "whiteKing",
+};
 
 export default function Square({ chessPiece = null, position, id }: Props) {
   const { isOver, setNodeRef } = useDroppable({
@@ -25,8 +40,8 @@ export default function Square({ chessPiece = null, position, id }: Props) {
     >
       {chessPiece && (
         <Piece
-          src={`/chessPieces/${chessPiece.getColor()}${chessPiece.getType()}.png`}
-          alt={`/chessPieces/${chessPiece.getColor()}${chessPiece.getType()}.png`}
+          src={`/chessPieces/${pieceMap[chessPiece] || chessPiece}.png`}
+          alt={`/chessPieces/${pieceMap[chessPiece] || chessPiece}.png`}
           x={position.x}
           y={position.y}
           id={id}

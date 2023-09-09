@@ -27,6 +27,7 @@ export default function Game() {
   }, []);
 
   const handleDragEnd = (event: DragEndEvent) => {
+    console.log(event);
     //make sure that the drag is valid
     if (!chessBoard) return;
     if (event.over == null || event.active == null) return;
@@ -38,15 +39,13 @@ export default function Game() {
       return false;
     }
     setTurn(chessBoard.turn);
-    console.log(newBoard);
-    console.log(chessBoard);
     setIsCheck(chessBoard.check);
     if (chessBoard.checkmate) {
       setWin(chessBoard.winner);
     }
     setIsCheckMate(chessBoard.checkmate);
   };
-
+  console.log(board);
   return (
     <>
       <div className="flex h-20 flex-row justify-center ">
