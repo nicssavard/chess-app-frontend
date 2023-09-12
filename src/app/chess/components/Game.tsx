@@ -2,7 +2,7 @@
 import { Container } from "@/components/ui/Container";
 import { useState, useEffect } from "react";
 import { DndContext, DragEndEvent, UniqueIdentifier } from "@dnd-kit/core";
-import Board from "@/app/test/components/Board";
+import Board from "./Board";
 import { ChessPosition } from "../../../../typings";
 import useStore from "@/store/userStore";
 
@@ -36,6 +36,19 @@ const fenToBoard = (fen: string): string[][] => {
   return board;
 };
 
+const moveVerification = (
+  start: ChessPosition,
+  end: ChessPosition,
+  board: string[][],
+  turn: "w" | "b"
+): boolean => {
+  if (start.x === end.x && start.y === end.y) return false;
+  const piece = board[start.y][start.x];
+  const pieceColor = piece.toUpperCase() === piece ? "w" : "b";
+  if (pieceColor != turn) return false;
+  return true;
+};
+
 interface ChessGame {
   gameId?: number;
   gameType: "random" | "bot" | "friend";
@@ -44,12 +57,11 @@ export default function Game({ gameId, gameType }: ChessGame) {
   const { user } = useStore((state) => ({ user: state.user }));
   const [webSocket, setWebSocket] = useState<WebSocket | null>(null);
   const [board, setBoard] = useState<string[][] | null>(null);
-  const [userColor, setUserColor] = useState<"w" | "b" | null>(null); //board[1]![0] is the white pawn   board[6]![0] is the black pawn
+  const [playerColor, setPlayerColor] = useState<"w" | "b" | null>(null); //board[1]![0] is the white pawn   board[6]![0] is the black pawn
   const [turn, setTurn] = useState<"w" | "b">("w");
   const [isCheck, setIsCheck] = useState<boolean>(false);
   const [isCheckMate, setIsCheckMate] = useState<boolean>(false);
   const [win, setWin] = useState<"white" | "black" | "none">("none");
-  console.log(userColor);
   useEffect(() => {
     // Initialize WebSocket connection
     if (gameId && user?.id) {
@@ -75,33 +87,22 @@ export default function Game({ gameId, gameType }: ChessGame) {
       };
 
       webSocket.onmessage = (e) => {
-        // console.log(`Message received: ${e.data}`);
         const newMessage = JSON.parse(e.data);
-        console.log(newMessage);
+        let board = newMessage;
         let newBoard;
         if (newMessage.color) {
+          board = JSON.parse(newMessage.board);
+          // first message to set the color
           newBoard = fenToBoard(
-            newMessage.board.fen.split(" ")[0].split("/").reverse().join("/")
+            board.fen.split(" ")[0].split("/").reverse().join("/")
           );
-          setUserColor(newMessage.color);
+          setPlayerColor(newMessage.color);
         } else {
-          // const newBoard = newMessage.fen
-          //   .split(" ")[0]
-          //   .split("/")
-          //   .reverse()
-          //   .join("/");
           newBoard = fenToBoard(
-            newMessage.fen.split(" ")[0].split("/").reverse().join("/")
+            board.fen.split(" ")[0].split("/").reverse().join("/")
           );
         }
-        console.log(newBoard);
-        // setChat((chat) => {
-        //   if (!chat) return null;
-        //   return {
-        //     ...chat,
-        //     messages: [...chat.messages, newMessage],
-        //   };
-        // });
+        setTurn(board.turn);
         setBoard(newBoard);
       };
 
@@ -115,20 +116,13 @@ export default function Game({ gameId, gameType }: ChessGame) {
     }
   }, [webSocket]);
 
-  const test = () => {
-    if (webSocket) {
-      webSocket.send("test");
-    }
-  };
-
   const handleDragEnd = (event: DragEndEvent) => {
-    console.log(event);
     //make sure that the drag is valid
     // if (!chessBoard) return;
     if (event.over == null || event.active == null) return;
     const start = idToLocation(event.active?.id);
     const end = idToLocation(event.over?.id);
-    if (start.x === end.x && start.y === end.y) return;
+    if (!moveVerification(start, end, board!, turn)) return false;
     if (webSocket) {
       webSocket.send(JSON.stringify({ start, end }));
     }
@@ -146,11 +140,11 @@ export default function Game({ gameId, gameType }: ChessGame) {
 
   return (
     <Container>
-      <h1 onClick={test}>Test</h1>
       <DndContext onDragEnd={handleDragEnd}>
         <div className="flex flex-col">
           {board && (
             <Board
+              playerColor={playerColor}
               board={board}
               className={`rounded-2xl relative overflow-hidden border-4 ${
                 turn === "w" ? "border-white" : "border-black"

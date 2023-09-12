@@ -17,7 +17,6 @@ export default function Menu({ setGameType }: MenuProps) {
     } else {
       setGameType(choice);
     }
-    console.log(choice);
   };
   return (
     <>

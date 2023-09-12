@@ -3,8 +3,8 @@ import { Pawn, Rook, Knight, Bishop, Queen, King } from "./ChessPiece";
 import _ from "lodash";
 
 enum PieceColor {
-  White = "white",
-  Black = "black",
+  White = "w",
+  Black = "b",
 }
 
 export class ChessBoard {
@@ -12,7 +12,7 @@ export class ChessBoard {
   turn: PieceColor = PieceColor.White;
   check: boolean = false;
   checkmate: boolean = false;
-  winner: "white" | "black" | "none" = "none";
+  winner: "w" | "b" | "none" = "none";
   alivePieces: Chesspiece[] = [];
   deadPieces: Chesspiece[] = [];
   moveHistory: string[] = []; //FEN notation
@@ -305,7 +305,7 @@ export class ChessBoard {
       this.check = true;
       if (this.isCheckmate(this.turn)) {
         this.checkmate = true;
-        this.winner = this.turn === PieceColor.White ? "black" : "white";
+        this.winner = this.turn === PieceColor.White ? "b" : "w";
       }
     } else {
       this.check = false;
