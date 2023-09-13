@@ -143,7 +143,7 @@ export class ChessBoard {
     for (let i = 0; i < 8; i++) {
       let emptyCount = 0;
       for (let j = 0; j < 8; j++) {
-        const piece = this.getPiece({ x: j, y: i });
+        const piece = this.board[i][j];
         if (piece) {
           if (emptyCount > 0) {
             fen += emptyCount;
@@ -194,9 +194,6 @@ export class ChessBoard {
     if (!piece.move(end)) return false;
     if (!this.testMoveForCheck(piece, end)) return false;
     this.makeMove(start, end);
-    const newBoard: Chessboard = this.board.map((row: (Chesspiece | null)[]) =>
-      row.slice()
-    ) as Chessboard;
 
     if (this.isCheck(this.turn)) {
       this.check = true;
@@ -207,14 +204,14 @@ export class ChessBoard {
     } else {
       this.check = false;
     }
-    return newBoard;
+    this.printBoard();
+    return this.board.map((row: (Chesspiece | null)[]) =>
+      row.slice()
+    ) as Chessboard;
   }
 
   public makeMove(start: ChessPosition, end: ChessPosition): void {
     let piece = this.getPiece(start);
-    if (piece?.getType() === "Pawn" && this.pawnPromotion(piece, end)) {
-      piece = new Queen(piece.getColor(), end, this);
-    }
     const deadPiece = this.getPiece(end);
     if (deadPiece) {
       this.deadPieces.push(deadPiece);
@@ -223,19 +220,21 @@ export class ChessBoard {
       );
     }
 
-    this.board[end.y][end.x] = piece;
-    this.board[start.y][start.x] = null;
-    piece?.setPosition(end);
-    this.turn =
-      this.turn === PieceColor.White ? PieceColor.Black : PieceColor.White;
+    this.setPieceAt(end, piece);
+    this.setPieceAt(start, null);
+
+    if (piece?.getType() === "Pawn" && this.pawnPromotion(piece, end)) {
+      this.promotePawn(piece);
+    }
+    this.changeTurn();
     this.moveHistory.push(this.getFEN());
   }
 
   testMoveForCheck(piece: Chesspiece, end: ChessPosition): boolean {
+    piece = _.cloneDeep(piece);
     const chessBoardCopy = _.cloneDeep(this);
-    const attackedPiece = chessBoardCopy.getPiece(end);
+    const attackedPiece = chessBoardCopy.board[end.y]![end.x];
     if (piece?.getColor() !== this.turn) return false;
-    if (piece === null || piece === undefined) return false;
     if (attackedPiece && attackedPiece.getType() === "King") return false;
 
     chessBoardCopy.makeMove(piece.getPosition(), end);
@@ -285,12 +284,10 @@ export class ChessBoard {
   }
 
   pawnPromotion(piece: Chesspiece, end: ChessPosition): boolean {
-    if (piece.getColor() === PieceColor.White && end.y === 7) {
-      this.board[end.y]![end.x] = new Queen(PieceColor.White, end, this);
-      return true;
-    }
-    if (piece.getColor() === PieceColor.Black && end.y === 0) {
-      this.board[end.y]![end.x] = new Queen(PieceColor.Black, end, this);
+    if (
+      (piece.getColor() === PieceColor.White && end.y === 7) ||
+      (piece.getColor() === PieceColor.Black && end.y === 0)
+    ) {
       return true;
     }
     return false;
@@ -314,5 +311,30 @@ export class ChessBoard {
 
   public getPieces(color: PieceColor): Chesspiece[] {
     return this.alivePieces.filter((p) => p?.getColor() === color);
+  }
+
+  public setPieceAt(position: ChessPosition, piece: Chesspiece | null): void {
+    this.board[position.y][position.x] = piece;
+    if (piece) {
+      piece.setPosition(position);
+    }
+  }
+
+  public printBoard(): void {
+    console.log(_.cloneDeep(this.board).reverse());
+  }
+
+  public setAlivePieces(pieces: Chesspiece[]): void {
+    this.alivePieces = pieces;
+  }
+  promotePawn(piece: Chesspiece): void {
+    const queen = new Queen(piece.getColor(), piece.getPosition(), this);
+    this.setPieceAt(piece.getPosition(), queen);
+    this.setAlivePieces(this.alivePieces.map((p) => (p === piece ? queen : p)));
+  }
+
+  public changeTurn(): void {
+    this.turn =
+      this.turn === PieceColor.White ? PieceColor.Black : PieceColor.White;
   }
 }

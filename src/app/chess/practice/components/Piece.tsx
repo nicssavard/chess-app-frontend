@@ -27,7 +27,7 @@ export function Piece({ src, alt, id }: Props) {
       style={style}
       {...listeners}
       {...attributes}
-      className="h-full w-full"
+      className="h-full w-full relative"
     >
       <Image
         draggable={false}
@@ -35,6 +35,7 @@ export function Piece({ src, alt, id }: Props) {
         src={src}
         alt={alt}
         fill={true}
+        sizes="(max-width: 640px) 100vw, 50vw"
       />
     </div>
   );

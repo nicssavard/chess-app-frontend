@@ -24,13 +24,14 @@ export function Piece({ src, alt, id, canDrag }: Props) {
 
   if (!canDrag) {
     return (
-      <div className="h-full w-full">
+      <div className="h-full w-full relative">
         <Image
           draggable={false}
           className="cursor-pointer"
           src={src}
           alt={alt}
           fill={true}
+          sizes="(max-width: 640px) 100vw, 50vw"
         />
       </div>
     );
@@ -41,7 +42,7 @@ export function Piece({ src, alt, id, canDrag }: Props) {
       style={style}
       {...listeners}
       {...attributes}
-      className="h-full w-full"
+      className="h-full w-full relative"
     >
       <Image
         draggable={false}
@@ -49,6 +50,7 @@ export function Piece({ src, alt, id, canDrag }: Props) {
         src={src}
         alt={alt}
         fill={true}
+        sizes="(max-width: 640px) 100vw, 50vw"
       />
     </div>
   );
