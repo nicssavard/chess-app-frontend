@@ -10,7 +10,7 @@ export default function Board({ board, className }: Props) {
   const boardDisplayed = board.map((row, i) => {
     return (
       <div key={i} className="flex flex-row justify-center ">
-        {row.map((piece: Chesspiece, j) => {
+        {row.map((piece: Chesspiece | null, j) => {
           return (
             <Square
               chessPiece={piece}

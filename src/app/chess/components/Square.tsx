@@ -1,6 +1,6 @@
 import { useDroppable } from "@dnd-kit/core";
 import { Piece } from "./Piece";
-import { ChessPosition, Chesspiece } from "../../../../typings";
+import { ChessPosition } from "../../../../typings";
 
 interface Props {
   playerColor: "w" | "b" | null;

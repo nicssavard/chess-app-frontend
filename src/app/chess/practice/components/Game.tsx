@@ -16,10 +16,10 @@ const idToLocation = (id: UniqueIdentifier): ChessPosition => {
 export default function Game() {
   const [chessBoard, setChessBoard] = useState<ChessBoard>();
   const [board, setBoard] = useState<Chessboard>(); //board[1]![0] is the white pawn   board[6]![0] is the black pawn
-  const [turn, setTurn] = useState<"white" | "black">("white");
+  const [turn, setTurn] = useState<"w" | "b">("w");
   const [isCheck, setIsCheck] = useState<boolean>(false);
   const [isCheckMate, setIsCheckMate] = useState<boolean>(false);
-  const [win, setWin] = useState<"white" | "black" | "none">("none");
+  const [win, setWin] = useState<"white" | "black" | "n">("n");
   useEffect(() => {
     const test = new ChessBoard();
     setChessBoard(test);
@@ -27,7 +27,6 @@ export default function Game() {
   }, []);
 
   const handleDragEnd = (event: DragEndEvent) => {
-    console.log(event);
     //make sure that the drag is valid
     if (!chessBoard) return;
     if (event.over == null || event.active == null) return;
@@ -45,7 +44,6 @@ export default function Game() {
     }
     setIsCheckMate(chessBoard.checkmate);
   };
-  console.log(board);
   return (
     <>
       <div className="flex h-20 flex-row justify-center ">
@@ -76,7 +74,7 @@ export default function Game() {
               <Board
                 board={board}
                 className={`rounded-2xl relative overflow-hidden border-4 ${
-                  turn === "white" ? "border-white" : "border-black"
+                  turn === "w" ? "border-white" : "border-black"
                 }`}
               />
             )}

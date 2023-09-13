@@ -7,6 +7,10 @@ interface Props {
   position: ChessPosition;
   id: string;
 }
+const colorMap: { [key: string]: string } = {
+  b: "black",
+  w: "white",
+};
 
 export default function Square({ chessPiece = null, position, id }: Props) {
   const { isOver, setNodeRef } = useDroppable({
@@ -25,7 +29,9 @@ export default function Square({ chessPiece = null, position, id }: Props) {
     >
       {chessPiece && (
         <Piece
-          src={`/chessPieces/${chessPiece.getColor()}${chessPiece.getType()}.png`}
+          src={`/chessPieces/${
+            colorMap[chessPiece.getColor()]
+          }${chessPiece.getType()}.png`}
           alt={`/chessPieces/${chessPiece.getColor()}${chessPiece.getType()}.png`}
           x={position.x}
           y={position.y}

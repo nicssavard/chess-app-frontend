@@ -33,6 +33,6 @@ type ChessPosition = {
   y: number;
 };
 
-type Chesspiece = Pawn | Rook | Knight | Bishop | Queen | King | null;
+type Chesspiece = Pawn | Rook | Knight | Bishop | Queen | King;
 
-type Chessboard = Chesspiece[][];
+type Chessboard = (Chesspiece | null)[][];

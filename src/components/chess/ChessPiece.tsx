@@ -59,7 +59,7 @@ export class Chesspiece {
 
   protected basicMoveChecks(end: ChessPosition): boolean {
     if (this.position.x === end.x && this.position.y === end.y) return false;
-    const target = this.board.getPieceAtPosition(end);
+    const target = this.board.getPiece(end);
     if (target && target.color === this.color) return false;
 
     return true;
@@ -93,7 +93,12 @@ export class Chesspiece {
     const dir = this.moveDirection(start, end);
     const length = Math.abs(end.x - start.x) || Math.abs(end.y - start.y);
     for (let i = 1; i < length; i++) {
-      if (this.board.board[start.y + i * dir.y][start.x + i * dir.x] !== null) {
+      if (
+        this.board.getPiece({
+          y: start.y + i * dir.y,
+          x: start.x + i * dir.x,
+        }) !== null
+      ) {
         return false;
       }
     }
@@ -105,7 +110,12 @@ export class Chesspiece {
   ) {
     const dir = this.moveDirection(start, end);
     for (let i = 1; i < Math.abs(end.y - start.y); i++) {
-      if (this.board.board[start.y + i * dir.y][start.x + i * dir.x] !== null) {
+      if (
+        this.board.getPiece({
+          x: start.x + i * dir.x,
+          y: start.y + i * dir.y,
+        }) !== null
+      ) {
         return false;
       }
     }
@@ -123,7 +133,7 @@ export class Pawn extends Chesspiece {
   }
 
   protected canMoveTo(end: ChessPosition): boolean {
-    if (this.getBoard().getPieceAtPosition(end)) {
+    if (this.getBoard().getPiece(end)) {
       return this.canAttack(end);
     } else {
       return this.canMoveStraight(end);

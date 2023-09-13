@@ -103,6 +103,9 @@ export default function Game({ gameId, gameType }: ChessGame) {
           );
         }
         setTurn(board.turn);
+        setIsCheck(board.check);
+        setIsCheckMate(board.checkmate);
+        setWin(board.winner);
         setBoard(newBoard);
       };
 

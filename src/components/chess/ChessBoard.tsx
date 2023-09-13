@@ -12,7 +12,7 @@ export class ChessBoard {
   turn: PieceColor = PieceColor.White;
   check: boolean = false;
   checkmate: boolean = false;
-  winner: "w" | "b" | "none" = "none";
+  winner: "white" | "black" | "n" = "n";
   alivePieces: Chesspiece[] = [];
   deadPieces: Chesspiece[] = [];
   moveHistory: string[] = []; //FEN notation
@@ -51,10 +51,8 @@ export class ChessBoard {
 
   constructor() {
     this.board = [];
-    console.log("Chessboard created");
-    console.log(this);
     this.board = Array.from({ length: 8 }, () =>
-      Array<Chesspiece>(8).fill(null)
+      Array(8).fill(null)
     ) as Chessboard;
     this.initializeBoard();
   }
@@ -138,115 +136,14 @@ export class ChessBoard {
       this.bRook2,
     ];
   }
-  // wPawns: Pawn[] = [];
-  // bPawns: Pawn[] = [];
-  // wRooks: Rook[] = [];
-  // bRooks: Rook[] = [];
-  // wKnights: Knight[] = [];
-  // bKnights: Knight[] = [];
-  // wBishops: Bishop[] = [];
-  // bBishops: Bishop[] = [];
-  // wQueen!: Queen;
-  // bQueen!: Queen;
-  // wKing!: King;
-  // bKing!: King;
 
-  // constructor() {
-  //   this.board = Array.from({ length: 8 }, () =>
-  //     Array<Chesspiece>(8).fill(null)
-  //   ) as Chessboard;
-  //   this.setupPieces();
-  //   this.initializeBoard();
-  // }
-
-  // private setupPieces(): void {
-  //   // Pawns
-  //   for (let i = 0; i < 8; i++) {
-  //     this.wPawns.push(new Pawn(PieceColor.White, { x: i, y: 1 }, this));
-  //     this.bPawns.push(new Pawn(PieceColor.Black, { x: i, y: 6 }, this));
-  //   }
-
-  //   // Rooks
-  //   this.wRooks.push(
-  //     new Rook(PieceColor.White, { x: 0, y: 0 }, this),
-  //     new Rook(PieceColor.White, { x: 7, y: 0 }, this)
-  //   );
-  //   this.bRooks.push(
-  //     new Rook(PieceColor.Black, { x: 0, y: 7 }, this),
-  //     new Rook(PieceColor.Black, { x: 7, y: 7 }, this)
-  //   );
-
-  //   // Knights
-  //   this.wKnights.push(
-  //     new Knight(PieceColor.White, { x: 1, y: 0 }, this),
-  //     new Knight(PieceColor.White, { x: 6, y: 0 }, this)
-  //   );
-  //   this.bKnights.push(
-  //     new Knight(PieceColor.Black, { x: 1, y: 7 }, this),
-  //     new Knight(PieceColor.Black, { x: 6, y: 7 }, this)
-  //   );
-
-  //   // Bishops
-  //   this.wBishops.push(
-  //     new Bishop(PieceColor.White, { x: 2, y: 0 }, this),
-  //     new Bishop(PieceColor.White, { x: 5, y: 0 }, this)
-  //   );
-  //   this.bBishops.push(
-  //     new Bishop(PieceColor.Black, { x: 2, y: 7 }, this),
-  //     new Bishop(PieceColor.Black, { x: 5, y: 7 }, this)
-  //   );
-
-  //   // Queens and Kings
-  //   this.wQueen = new Queen(PieceColor.White, { x: 3, y: 0 }, this);
-  //   this.bQueen = new Queen(PieceColor.Black, { x: 4, y: 7 }, this);
-  //   this.wKing = new King(PieceColor.White, { x: 4, y: 0 }, this);
-  //   this.bKing = new King(PieceColor.Black, { x: 3, y: 7 }, this);
-  // }
-  // public initializeBoard(): void {
-  //   this.board[0] = [
-  //     this.wRooks[0],
-  //     this.wKnights[0],
-  //     this.wBishops[0],
-  //     this.wQueen,
-  //     this.wKing,
-  //     this.wBishops[1],
-  //     this.wKnights[1],
-  //     this.wRooks[1],
-  //   ];
-  //   this.board[1] = [...this.wPawns];
-  //   this.board[6] = [...this.bPawns];
-  //   this.board[7] = [
-  //     this.bRooks[0],
-  //     this.bKnights[0],
-  //     this.bBishops[0],
-  //     this.bQueen,
-  //     this.bKing,
-  //     this.bBishops[1],
-  //     this.bKnights[1],
-  //     this.bRooks[1],
-  //   ];
-  //   this.alivePieces = [
-  //     ...this.wPawns,
-  //     ...this.bPawns,
-  //     ...this.wRooks,
-  //     ...this.bRooks,
-  //     ...this.wKnights,
-  //     ...this.bKnights,
-  //     ...this.wBishops,
-  //     ...this.bBishops,
-  //     this.wQueen,
-  //     this.bQueen,
-  //     this.wKing,
-  //     this.bKing,
-  //   ];
-  // }
   public getFEN(): string {
     //Not okay
     let fen = "";
     for (let i = 0; i < 8; i++) {
       let emptyCount = 0;
       for (let j = 0; j < 8; j++) {
-        const piece = this.board[i][j];
+        const piece = this.getPiece({ x: j, y: i });
         if (piece) {
           if (emptyCount > 0) {
             fen += emptyCount;
@@ -291,13 +188,13 @@ export class ChessBoard {
   }
 
   public move(start: ChessPosition, end: ChessPosition): false | Chessboard {
-    const piece = this.getPieceAtPosition(start);
+    const piece = this.getPiece(start);
     if (!piece) return false;
     if (piece.getColor() !== this.turn) return false;
     if (!piece.move(end)) return false;
     if (!this.testMoveForCheck(piece, end)) return false;
     this.makeMove(start, end);
-    const newBoard: Chessboard = this.board.map((row: Chesspiece[]) =>
+    const newBoard: Chessboard = this.board.map((row: (Chesspiece | null)[]) =>
       row.slice()
     ) as Chessboard;
 
@@ -305,7 +202,7 @@ export class ChessBoard {
       this.check = true;
       if (this.isCheckmate(this.turn)) {
         this.checkmate = true;
-        this.winner = this.turn === PieceColor.White ? "b" : "w";
+        this.winner = this.turn === PieceColor.White ? "black" : "white";
       }
     } else {
       this.check = false;
@@ -314,11 +211,11 @@ export class ChessBoard {
   }
 
   public makeMove(start: ChessPosition, end: ChessPosition): void {
-    let piece = this.getPieceAtPosition(start);
+    let piece = this.getPiece(start);
     if (piece?.getType() === "Pawn" && this.pawnPromotion(piece, end)) {
       piece = new Queen(piece.getColor(), end, this);
     }
-    const deadPiece = this.getPieceAtPosition(end);
+    const deadPiece = this.getPiece(end);
     if (deadPiece) {
       this.deadPieces.push(deadPiece);
       this.alivePieces = this.alivePieces.filter(
@@ -336,37 +233,22 @@ export class ChessBoard {
 
   testMoveForCheck(piece: Chesspiece, end: ChessPosition): boolean {
     const chessBoardCopy = _.cloneDeep(this);
-    const attackedPiece = chessBoardCopy.board[end.y]![end.x];
-    if (piece?.getColor() !== this.turn) {
-      return false;
-    }
-    if (piece === null || piece === undefined) {
-      return false;
-    }
+    const attackedPiece = chessBoardCopy.getPiece(end);
+    if (piece?.getColor() !== this.turn) return false;
+    if (piece === null || piece === undefined) return false;
+    if (attackedPiece && attackedPiece.getType() === "King") return false;
 
-    if (attackedPiece && attackedPiece.getType() === "King") {
-      return false;
-    }
     chessBoardCopy.makeMove(piece.getPosition(), end);
-    if (chessBoardCopy.isCheck(this.turn)) {
-      return false;
-    }
+    if (chessBoardCopy.isCheck(this.turn)) return false;
+
     return true;
   }
   isCheck(color: PieceColor = PieceColor.White): boolean {
-    const flatBoard = this.board.flat();
-    const king = flatBoard.filter(
-      (p) => p?.getType() === "King" && p?.getColor() === color
-    )[0];
+    const king = this.getKing(color);
     let isCheck = false;
-    const pieces = flatBoard.filter((p) => {
-      return (
-        p !== null &&
-        p !== undefined &&
-        p.getColor() ===
-          (color === PieceColor.White ? PieceColor.Black : PieceColor.White)
-      );
-    });
+    const pieces = this.getPieces(
+      color === PieceColor.White ? PieceColor.Black : PieceColor.White
+    );
     pieces.forEach((p) => {
       if (p?.move(king!.getPosition())) {
         isCheck = true;
@@ -382,12 +264,7 @@ export class ChessBoard {
     }
 
     // Iterate through all of the player's pieces
-    for (const piece of this.alivePieces.filter(
-      (p) => p?.getColor() === color
-    )) {
-      if (piece === null || piece === undefined) {
-        return false;
-      }
+    for (const piece of this.getPieces(color)) {
       // For each piece, iterate through all possible moves
       for (let x = 0; x < 8; x++) {
         for (let y = 0; y < 8; y++) {
@@ -408,10 +285,6 @@ export class ChessBoard {
   }
 
   pawnPromotion(piece: Chesspiece, end: ChessPosition): boolean {
-    if (!piece) {
-      return false;
-    }
-
     if (piece.getColor() === PieceColor.White && end.y === 7) {
       this.board[end.y]![end.x] = new Queen(PieceColor.White, end, this);
       return true;
@@ -423,7 +296,23 @@ export class ChessBoard {
     return false;
   }
 
-  public getPieceAtPosition(position: ChessPosition): Chesspiece | null {
+  public isPieceAt(position: ChessPosition): boolean {
+    return this.board[position.y][position.x] !== null;
+  }
+
+  public getPiece(position: ChessPosition): Chesspiece | null {
     return this.board[position.y][position.x];
+  }
+
+  public getKing(color: PieceColor): King {
+    if (color === PieceColor.White) {
+      return this.wKing;
+    } else {
+      return this.bKing;
+    }
+  }
+
+  public getPieces(color: PieceColor): Chesspiece[] {
+    return this.alivePieces.filter((p) => p?.getColor() === color);
   }
 }

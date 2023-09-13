@@ -1,4 +1,3 @@
-import { Chessboard, Chesspiece } from "../../../../typings";
 import Square from "./Square";
 
 interface Props {
