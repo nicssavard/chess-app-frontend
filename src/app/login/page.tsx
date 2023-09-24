@@ -1,11 +1,14 @@
 "use client";
 import { Container } from "@/components/ui/Container";
+import Link from "next/link";
 import axios from "axios";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import FormInput from "@/components/ui/FormInput";
 import useStore from "@/store/userStore";
+import { LoadingSpinner } from "@/components/ui/Loading";
+import toast, { Toaster } from "react-hot-toast";
 
 interface FormInputs {
   username: string;
@@ -30,7 +33,7 @@ export default function Login() {
         username: username,
         password: password,
       })
-      .then(function (response) {
+      .then(function(response) {
         console.log(response);
         const user = response.data.user;
         const token = response.data.access;
@@ -41,20 +44,24 @@ export default function Login() {
         axios.post;
         router.push("/");
       })
-      .catch(function (error) {
+      .catch(function(error) {
+        setIsLoading(false)
         console.log(error);
+        toast.error(`Wrong username or password. 
+                      Please try again!`)
       });
   };
   return (
     <Container>
       <div className="flex flex-col">
         <div className="flex flex-row justify-center mt-12">
-          <div className="border-sm rounded-md border-gray-400 border-2 p-5 shadow-2xl ">
+          <div className="rounded-lg p-5 bg-gray-900 shadow-2xl ">
             <form onSubmit={handleSubmit(onSubmit)} className="">
               <FormInput
                 register={register("username", { required: true })}
                 type="username"
                 placeholder="Username"
+                className=""
               />
               <div className="mt-2">
                 <FormInput
@@ -63,18 +70,35 @@ export default function Login() {
                   placeholder="Password"
                 />
               </div>
-              <div className="flex flex-row justify-center mt-2">
-                <button
+              <div className="border-b-2 border-gray-600 pb-6 flex flex-row justify-center mt-2">
+                {!isLoading && (<button
                   type="submit"
-                  className="bg-blue-400 w-full text-white rounded-lg"
+                  className="bg-blue-500 w-full text-2xl text-white rounded-lg sm:text-3xl sm:py-2"
                 >
                   Login
-                </button>
+                </button>)}
+                {isLoading && (<div
+                  className="bg-blue-500 w-full text-2xl text-white rounded-lg sm:text-3xl sm:py-2"
+                >
+                  <div className="flex flex-row justify-center">
+                    <LoadingSpinner size={40} />
+
+                  </div>
+                </div>)}
               </div>
+              <Link href='/signin'>
+                <div className=" mt-6 justify-center flex flex-row ">
+                  <button className="hover:bg-green-700 bg-green-600 w-1/2 text-2xl text-white rounded-lg sm:text-3xl sm:py-2"
+                  >
+                    Sign Up
+                  </button>
+                </div>
+              </Link>
             </form>
           </div>
         </div>
       </div>
+      <Toaster position="bottom-center" />
     </Container>
   );
 }

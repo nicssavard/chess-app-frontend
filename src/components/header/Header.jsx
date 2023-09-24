@@ -1,5 +1,5 @@
 "use client";
-import React, { use } from "react";
+import React from "react";
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
 import classNames from "classnames";
 import { CaretDownIcon } from "@radix-ui/react-icons";
@@ -82,9 +82,9 @@ export default function Header() {
 
   return (
     <NavigationMenu.Root className="relative z-[1] flex  justify-center ">
-      <NavigationMenu.List className="center shadow-blackA7 m-0 flex list-none rounded-[6px] bg-gray-900 p-1 shadow-[0_2px_10px] mt-2">
+      <NavigationMenu.List className="center  m-0 flex list-none rounded-[6px] bg-gray-900 p-1  mt-2">
         <NavigationMenu.Item>
-          <NavigationMenu.Trigger className="text-gray-400 hover:bg-gray-700  focus:shadow-blue-400 group flex select-none items-center justify-between gap-[2px] rounded-[4px] px-3 py-2 text-xl font-medium leading-none outline-none focus:shadow-[0_0_0_2px]">
+          <NavigationMenu.Trigger className="text-gray-400 hover:bg-gray-700 group flex select-none items-center justify-between gap-[2px] rounded-[4px] px-3 py-2 text-xl font-medium leading-none outline-none focus:shadow-[0_0_0_2px]">
             Play{" "}
             <CaretDownIcon
               className="  relative top-[1px] transition-transform duration-[250] ease-in group-data-[state=open]:-rotate-180 h-6 w-6"
