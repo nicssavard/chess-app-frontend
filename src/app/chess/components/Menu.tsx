@@ -1,5 +1,7 @@
 "use client";
 import { useRef } from "react";
+import toast, { Toaster } from "react-hot-toast";
+
 interface MenuProps {
   setGameType: (gameType: "random" | "bot" | "friend", gameId?: number) => void;
 }
@@ -13,37 +15,46 @@ export default function Menu({ setGameType }: MenuProps) {
     e.preventDefault();
     if (choice === "friend") {
       if (!gameId.current?.value) return;
+      let id = parseInt(gameId.current?.value);
+      console.log(id);
+      if (isNaN(id) || id <= 0) {
+        toast.error("Invalid game id");
+        gameId.current!.value = "";
+        return;
+      }
       setGameType(choice, parseInt(gameId.current?.value));
+
     } else {
       setGameType(choice);
     }
   };
   return (
     <>
-      <div className="bg-gray-900 rounded-xl m-20 p-20">
-        <div className="flex flex-col text-3xl">
+      <div className="m-5 rounded-xl bg-gray-900 p-10 mt-20" >
+        <div className="flex flex-col text-xl sm:text-4xl">
           <button
             onClick={(e) => handleChoice(e, "random")}
-            className="bg-gray-700 text-gray-400 rounded-xl px-4 py-2 shadow-blackA7 shadow-[0_2px_10px] hover:scale-110 transition duration-100 transform"
+            className="transform rounded-xl bg-gray-700 px-4 py-2 text-gray-400 shadow-sm shadow-gray-400 transition duration-100 hover:scale-110"
           >
             Find a random opponent
           </button>
           <button
             onClick={(e) => handleChoice(e, "bot")}
-            className="bg-gray-700 text-gray-400 rounded-xl px-4 py-2 shadow-blackA7 shadow-[0_2px_10px] mt-5 hover:scale-110 transition duration-100 transform"
+            className="mt-5 transform rounded-xl bg-gray-700 px-4 py-2 text-gray-400  shadow-sm shadow-gray-400 transition duration-100 hover:scale-110"
           >
             Play against a bot
           </button>
           <form
             onSubmit={(e) => handleChoice(e, "friend")}
-            className="bg-gray-700 text-gray-400 rounded-xl px-4 py-2 shadow-blackA7 shadow-[0_2px_10px] mt-5 hover:scale-110 transition duration-100 transform"
+            className="mt-5 transform rounded-xl bg-gray-700 px-4 py-2 text-gray-400 shadow-sm shadow-gray-400 transition duration-100 hover:scale-110"
           >
             <div className="flex flex-row">
-              <div>Enter game Id</div>
+              <label htmlFor='game-id'>Enter game Id</label>
               <input
                 ref={gameId}
-                className="bg-gray-200 rounded-xl pl-2 ml-2 w-20"
+                className="ml-2 w-20 rounded-xl bg-gray-200 pl-2"
                 type="text"
+                id='game-id'
               ></input>
               <button className="ml-4 flex-grow">
                 <svg
@@ -65,6 +76,7 @@ export default function Menu({ setGameType }: MenuProps) {
           </form>
         </div>
       </div>
+      <Toaster position="top-center" />
     </>
   );
 }
