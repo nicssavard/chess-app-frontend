@@ -52,7 +52,7 @@ export class ChessBoard {
   constructor() {
     this.board = [];
     this.board = Array.from({ length: 8 }, () =>
-      Array(8).fill(null)
+      Array(8).fill(null),
     ) as Chessboard;
     this.initializeBoard();
   }
@@ -92,7 +92,7 @@ export class ChessBoard {
       this.wQueen,
       this.bQueen,
       this.wKing,
-      this.bKing
+      this.bKing,
     );
 
     this.board[0] = [
@@ -188,6 +188,9 @@ export class ChessBoard {
   }
 
   public move(start: ChessPosition, end: ChessPosition): false | Chessboard {
+    console.log("move");
+    console.log("x: ", start.x, "y: ", start.y);
+    console.log(this.getSquareCode(start));
     const piece = this.getPiece(start);
     if (!piece) return false;
     if (piece.getColor() !== this.turn) return false;
@@ -206,7 +209,7 @@ export class ChessBoard {
     }
     this.printBoard();
     return this.board.map((row: (Chesspiece | null)[]) =>
-      row.slice()
+      row.slice(),
     ) as Chessboard;
   }
 
@@ -216,7 +219,7 @@ export class ChessBoard {
     if (deadPiece) {
       this.deadPieces.push(deadPiece);
       this.alivePieces = this.alivePieces.filter(
-        (piece) => piece !== deadPiece
+        (piece) => piece !== deadPiece,
       );
     }
 
@@ -228,6 +231,11 @@ export class ChessBoard {
     }
     this.changeTurn();
     this.moveHistory.push(this.getFEN());
+  }
+
+  getSquareCode(position: ChessPosition): string {
+    const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
+    return `${letters[position.x]}${position.y + 1}`;
   }
 
   testMoveForCheck(piece: Chesspiece, end: ChessPosition): boolean {
@@ -246,7 +254,7 @@ export class ChessBoard {
     const king = this.getKing(color);
     let isCheck = false;
     const pieces = this.getPieces(
-      color === PieceColor.White ? PieceColor.Black : PieceColor.White
+      color === PieceColor.White ? PieceColor.Black : PieceColor.White,
     );
     pieces.forEach((p) => {
       if (p?.move(king!.getPosition())) {
