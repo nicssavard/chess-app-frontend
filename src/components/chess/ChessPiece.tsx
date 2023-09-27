@@ -9,7 +9,7 @@ export class Chesspiece {
   private position: ChessPosition;
   private board: ChessBoard;
   private type: string;
-
+  public moves: ChessPosition[] = [];
   constructor(
     color: PieceColor,
     position: ChessPosition,
@@ -132,6 +132,21 @@ export class Pawn extends Chesspiece {
     super(color, position, board, "Pawn");
   }
 
+  public generateMoves() {
+    const p = this.getPosition();
+    if (this.getColor() === PieceColor.White) {
+      if (this.canMoveTo({ x: p.x, y: p.y + 1 })) {
+        this.moves.push({ x: p.x, y: p.y + 1 });
+      }
+      if (this.canMoveTo({ x: p.x, y: p.y + 2 })) {
+        this.moves.push({ x: p.x, y: p.y + 2 });
+      }
+    }
+  }
+  public getMoves() {
+    this.generateMoves();
+    return this.moves;
+  }
   protected canMoveTo(end: ChessPosition): boolean {
     if (this.getBoard().getPiece(end)) {
       return this.canAttack(end);

@@ -52,15 +52,17 @@ export class ChessBoard {
   wKing: King = new King(PieceColor.White, { x: 4, y: 0 }, this);
   bKing: King = new King(PieceColor.Black, { x: 4, y: 7 }, this);
 
-  constructor() {
+  constructor(
+    fen: string = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+  ) {
     this.board = [];
     this.board = Array.from({ length: 8 }, () =>
       Array(8).fill(null),
     ) as Chessboard;
-    this.initializeBoard();
+    this.initializeBoard(fen);
   }
 
-  public initializeBoard(): void {
+  public initializeBoard(fen: string): void {
     // Populate the board with pawns
 
     this.alivePieces.push(
