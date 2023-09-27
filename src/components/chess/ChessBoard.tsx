@@ -10,6 +10,9 @@ enum PieceColor {
 export class ChessBoard {
   board: Chessboard = []; //has to be checked with y,x  board[y][x]
   turn: PieceColor = PieceColor.White;
+  halfmoves: number = 0;
+  fullmoves: number = 1;
+  enPassant: ChessPosition | null = null;
   check: boolean = false;
   checkmate: boolean = false;
   winner: "white" | "black" | "n" = "n";
@@ -182,7 +185,29 @@ export class ChessBoard {
         fen += "/";
       }
     }
+    fen = fen.split("/").reverse().join("/");
     fen += ` ${this.turn === PieceColor.White ? "w" : "b"} `;
+    let castle = "";
+    if (!this.wKing.hasMoved) {
+      if (!this.wRook2.hasMoved) {
+        castle += "K";
+      }
+      if (!this.wRook1.hasMoved) {
+        castle += "Q";
+      }
+    }
+    if (!this.bKing.hasMoved) {
+      if (!this.bRook2.hasMoved) {
+        castle += "k";
+      }
+      if (!this.bRook1.hasMoved) {
+        castle += "q";
+      }
+    }
+    fen += castle.length > 0 ? `${castle} ` : "- ";
+
+    fen += this.enPassant ? this.getSquareCode(this.enPassant) : "-";
+    fen += ` ${this.halfmoves} ${this.fullmoves}`;
 
     return fen;
   }

@@ -14,7 +14,7 @@ export class Chesspiece {
     color: PieceColor,
     position: ChessPosition,
     board: ChessBoard,
-    type: string
+    type: string,
   ) {
     this.color = color;
     this.position = position;
@@ -40,7 +40,7 @@ export class Chesspiece {
 
   protected moveDirection(
     start: ChessPosition,
-    end: ChessPosition
+    end: ChessPosition,
   ): { x: number; y: number } {
     return {
       x: end.x > start.x ? 1 : end.x < start.x ? -1 : 0,
@@ -76,19 +76,19 @@ export class Chesspiece {
 
   protected isLinear(
     start: { x: number; y: number },
-    end: { x: number; y: number }
+    end: { x: number; y: number },
   ) {
     return start.x === end.x || start.y === end.y;
   }
   protected isDiagonal(
     start: { x: number; y: number },
-    end: { x: number; y: number }
+    end: { x: number; y: number },
   ) {
     return Math.abs(start.x - end.x) === Math.abs(start.y - end.y);
   }
   protected lineClear(
     start: { x: number; y: number },
-    end: { x: number; y: number }
+    end: { x: number; y: number },
   ) {
     const dir = this.moveDirection(start, end);
     const length = Math.abs(end.x - start.x) || Math.abs(end.y - start.y);
@@ -106,7 +106,7 @@ export class Chesspiece {
   }
   protected diagonalClear(
     start: { x: number; y: number },
-    end: { x: number; y: number }
+    end: { x: number; y: number },
   ) {
     const dir = this.moveDirection(start, end);
     for (let i = 1; i < Math.abs(end.y - start.y); i++) {
@@ -186,6 +186,7 @@ export class Pawn extends Chesspiece {
 }
 
 export class Rook extends Chesspiece {
+  hasMoved: boolean = false;
   constructor(color: PieceColor, position: ChessPosition, board: ChessBoard) {
     super(color, position, board, "Rook");
   }
@@ -195,6 +196,10 @@ export class Rook extends Chesspiece {
       this.isLinear(this.getPosition(), end) &&
       this.lineClear(this.getPosition(), end)
     );
+  }
+
+  protected setHasMoved() {
+    this.hasMoved = true;
   }
 }
 
@@ -239,6 +244,7 @@ export class Queen extends Chesspiece {
 }
 
 export class King extends Chesspiece {
+  hasMoved: boolean = false;
   constructor(color: PieceColor, position: ChessPosition, board: ChessBoard) {
     super(color, position, board, "King");
   }
@@ -247,5 +253,8 @@ export class King extends Chesspiece {
       Math.abs(this.getPosition().x - end.x) <= 1 &&
       Math.abs(this.getPosition().y - end.y) <= 1
     );
+  }
+  protected setHasMoved() {
+    this.hasMoved = true;
   }
 }

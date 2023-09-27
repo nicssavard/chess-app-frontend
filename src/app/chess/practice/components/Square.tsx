@@ -29,9 +29,8 @@ export default function Square({ chessPiece = null, position, id }: Props) {
     >
       {chessPiece && (
         <Piece
-          src={`/chessPieces/${
-            colorMap[chessPiece.getColor()]
-          }${chessPiece.getType()}.png`}
+          src={`/chessPieces/${colorMap[chessPiece.getColor()]
+            }${chessPiece.getType()}.png`}
           alt={`/chessPieces/${chessPiece.getColor()}${chessPiece.getType()}.png`}
           x={position.x}
           y={position.y}
