@@ -1,17 +1,18 @@
 import { useState, useEffect } from "react";
 import { DndContext, DragEndEvent, UniqueIdentifier } from "@dnd-kit/core";
 import Board from "./Board";
+import BoardPosition from "@/components/chess/BoardPosition";
 import { ChessBoard } from "@/components/chess/ChessBoard";
 import { ChessPosition, Chessboard } from "../../../../../typings";
 import _, { set } from "lodash";
 
-const idToLocation = (id: UniqueIdentifier): ChessPosition => {
+const idToLocation = (id: UniqueIdentifier): BoardPosition => {
   // get coordinates for the board
   id = id.toString();
 
   const x = parseInt(id?.[0] ?? "0");
   const y = parseInt(id?.[1] ?? "0");
-  return { x, y };
+  return new BoardPosition(x, y);
 };
 export default function Game() {
   const [chessBoard, setChessBoard] = useState<ChessBoard>();

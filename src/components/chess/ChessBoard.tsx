@@ -20,38 +20,38 @@ export class ChessBoard {
   alivePieces: Chesspiece[] = [];
   deadPieces: Chesspiece[] = [];
   moveHistory: string[] = []; //FEN notation
-  wPawn1: Pawn = new Pawn(PieceColor.White, { x: 0, y: 1 }, this);
-  wPawn2: Pawn = new Pawn(PieceColor.White, { x: 1, y: 1 }, this);
-  wPawn3: Pawn = new Pawn(PieceColor.White, { x: 2, y: 1 }, this);
-  wPawn4: Pawn = new Pawn(PieceColor.White, { x: 3, y: 1 }, this);
-  wPawn5: Pawn = new Pawn(PieceColor.White, { x: 4, y: 1 }, this);
-  wPawn6: Pawn = new Pawn(PieceColor.White, { x: 5, y: 1 }, this);
-  wPawn7: Pawn = new Pawn(PieceColor.White, { x: 6, y: 1 }, this);
-  wPawn8: Pawn = new Pawn(PieceColor.White, { x: 7, y: 1 }, this);
-  bPawn1: Pawn = new Pawn(PieceColor.Black, { x: 0, y: 6 }, this);
-  bPawn2: Pawn = new Pawn(PieceColor.Black, { x: 1, y: 6 }, this);
-  bPawn3: Pawn = new Pawn(PieceColor.Black, { x: 2, y: 6 }, this);
-  bPawn4: Pawn = new Pawn(PieceColor.Black, { x: 3, y: 6 }, this);
-  bPawn5: Pawn = new Pawn(PieceColor.Black, { x: 4, y: 6 }, this);
-  bPawn6: Pawn = new Pawn(PieceColor.Black, { x: 5, y: 6 }, this);
-  bPawn7: Pawn = new Pawn(PieceColor.Black, { x: 6, y: 6 }, this);
-  bPawn8: Pawn = new Pawn(PieceColor.Black, { x: 7, y: 6 }, this);
-  wRook1: Rook = new Rook(PieceColor.White, { x: 0, y: 0 }, this);
-  wRook2: Rook = new Rook(PieceColor.White, { x: 7, y: 0 }, this);
-  bRook1: Rook = new Rook(PieceColor.Black, { x: 0, y: 7 }, this);
-  bRook2: Rook = new Rook(PieceColor.Black, { x: 7, y: 7 }, this);
-  wKnight1: Knight = new Knight(PieceColor.White, { x: 1, y: 0 }, this);
-  wKnight2: Knight = new Knight(PieceColor.White, { x: 6, y: 0 }, this);
-  bKnight1: Knight = new Knight(PieceColor.Black, { x: 1, y: 7 }, this);
-  bKnight2: Knight = new Knight(PieceColor.Black, { x: 6, y: 7 }, this);
-  wBishop1: Bishop = new Bishop(PieceColor.White, { x: 2, y: 0 }, this);
-  wBishop2: Bishop = new Bishop(PieceColor.White, { x: 5, y: 0 }, this);
-  bBishop1: Bishop = new Bishop(PieceColor.Black, { x: 2, y: 7 }, this);
-  bBishop2: Bishop = new Bishop(PieceColor.Black, { x: 5, y: 7 }, this);
-  wQueen: Queen = new Queen(PieceColor.White, { x: 3, y: 0 }, this);
-  bQueen: Queen = new Queen(PieceColor.Black, { x: 3, y: 7 }, this);
-  wKing: King = new King(PieceColor.White, { x: 4, y: 0 }, this);
-  bKing: King = new King(PieceColor.Black, { x: 4, y: 7 }, this);
+  // wPawn1: Pawn = new Pawn(PieceColor.White, { x: 0, y: 1 }, this);
+  // wPawn2: Pawn = new Pawn(PieceColor.White, { x: 1, y: 1 }, this);
+  // wPawn3: Pawn = new Pawn(PieceColor.White, { x: 2, y: 1 }, this);
+  // wPawn4: Pawn = new Pawn(PieceColor.White, { x: 3, y: 1 }, this);
+  // wPawn5: Pawn = new Pawn(PieceColor.White, { x: 4, y: 1 }, this);
+  // wPawn6: Pawn = new Pawn(PieceColor.White, { x: 5, y: 1 }, this);
+  // wPawn7: Pawn = new Pawn(PieceColor.White, { x: 6, y: 1 }, this);
+  // wPawn8: Pawn = new Pawn(PieceColor.White, { x: 7, y: 1 }, this);
+  // bPawn1: Pawn = new Pawn(PieceColor.Black, { x: 0, y: 6 }, this);
+  // bPawn2: Pawn = new Pawn(PieceColor.Black, { x: 1, y: 6 }, this);
+  // bPawn3: Pawn = new Pawn(PieceColor.Black, { x: 2, y: 6 }, this);
+  // bPawn4: Pawn = new Pawn(PieceColor.Black, { x: 3, y: 6 }, this);
+  // bPawn5: Pawn = new Pawn(PieceColor.Black, { x: 4, y: 6 }, this);
+  // bPawn6: Pawn = new Pawn(PieceColor.Black, { x: 5, y: 6 }, this);
+  // bPawn7: Pawn = new Pawn(PieceColor.Black, { x: 6, y: 6 }, this);
+  // bPawn8: Pawn = new Pawn(PieceColor.Black, { x: 7, y: 6 }, this);
+  wRook1: Rook = new Rook(PieceColor.White, new BoardPosition(0, 0), this);
+  wRook2: Rook = new Rook(PieceColor.White, new BoardPosition(7, 0), this);
+  bRook1: Rook = new Rook(PieceColor.Black, new BoardPosition(0, 7), this);
+  bRook2: Rook = new Rook(PieceColor.Black, new BoardPosition(7, 7), this);
+  // wKnight1: Knight = new Knight(PieceColor.White, { x: 1, y: 0 }, this);
+  // wKnight2: Knight = new Knight(PieceColor.White, { x: 6, y: 0 }, this);
+  // bKnight1: Knight = new Knight(PieceColor.Black, { x: 1, y: 7 }, this);
+  // bKnight2: Knight = new Knight(PieceColor.Black, { x: 6, y: 7 }, this);
+  // wBishop1: Bishop = new Bishop(PieceColor.White, { x: 2, y: 0 }, this);
+  // wBishop2: Bishop = new Bishop(PieceColor.White, { x: 5, y: 0 }, this);
+  // bBishop1: Bishop = new Bishop(PieceColor.Black, { x: 2, y: 7 }, this);
+  // bBishop2: Bishop = new Bishop(PieceColor.Black, { x: 5, y: 7 }, this);
+  // wQueen: Queen = new Queen(PieceColor.White, { x: 3, y: 0 }, this);
+  // bQueen: Queen = new Queen(PieceColor.Black, { x: 3, y: 7 }, this);
+  wKing: King = new King(PieceColor.White, new BoardPosition(4, 0), this);
+  bKing: King = new King(PieceColor.Black, new BoardPosition(4, 7), this);
 
   constructor(
     fen: string = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
@@ -155,7 +155,7 @@ export class ChessBoard {
             new BoardPosition(x, 7 - i),
           );
           if (piece) {
-            this.setPieceAt({ x, y: 7 - i }, piece);
+            this.setPieceAt(new BoardPosition(x, 7 - i), piece);
             this.alivePieces.push(piece);
           }
           x++;
@@ -293,7 +293,7 @@ export class ChessBoard {
     return this.getFEN().split(" ")[5];
   }
 
-  public move(start: ChessPosition, end: ChessPosition): false | Chessboard {
+  public move(start: BoardPosition, end: BoardPosition): false | Chessboard {
     const piece = this.getPiece(start);
     if (!piece) return false;
     if (piece.getColor() !== this.turn) return false;
@@ -316,7 +316,7 @@ export class ChessBoard {
     ) as Chessboard;
   }
 
-  public makeMove(start: ChessPosition, end: ChessPosition): void {
+  public makeMove(start: BoardPosition, end: BoardPosition): void {
     let piece = this.getPiece(start);
     const deadPiece = this.getPiece(end);
     if (deadPiece) {
@@ -350,7 +350,7 @@ export class ChessBoard {
     return `${letters[position.x]}${position.y + 1}`;
   }
 
-  testMoveForCheck(piece: Chesspiece, end: ChessPosition): boolean {
+  testMoveForCheck(piece: Chesspiece, end: BoardPosition): boolean {
     piece = _.cloneDeep(piece);
     const chessBoardCopy = _.cloneDeep(this);
     const attackedPiece = chessBoardCopy.board[end.y]![end.x];
@@ -387,7 +387,7 @@ export class ChessBoard {
       // For each piece, iterate through all possible moves
       for (let x = 0; x < 8; x++) {
         for (let y = 0; y < 8; y++) {
-          const end = { x, y };
+          const end = new BoardPosition(x, y);
           if (piece.canMove(end)) {
             if (this.testMoveForCheck(piece, end)) {
               return false;
@@ -433,7 +433,7 @@ export class ChessBoard {
     return this.alivePieces.filter((p) => p?.getColor() === color);
   }
 
-  public setPieceAt(position: ChessPosition, piece: Chesspiece | null): void {
+  public setPieceAt(position: BoardPosition, piece: Chesspiece | null): void {
     this.board[position.y][position.x] = piece;
     if (piece) {
       piece.setPosition(position);

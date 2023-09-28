@@ -1,17 +1,16 @@
-import { ChessPosition } from "../../../typings";
 import { ChessBoard } from "./ChessBoard";
 import BoardPosition from "./BoardPosition";
 import { PieceColor } from "./ChessBoard";
 
 export class Chesspiece {
   private color: PieceColor;
-  private position: ChessPosition;
+  private position: BoardPosition;
   private board: ChessBoard;
   private type: string;
-  public moves: ChessPosition[] = [];
+  public moves: BoardPosition[] = [];
   constructor(
     color: PieceColor,
-    position: ChessPosition,
+    position: BoardPosition,
     board: ChessBoard,
     type: string,
   ) {
@@ -25,7 +24,7 @@ export class Chesspiece {
     return this.color;
   }
 
-  public getPosition(): ChessPosition {
+  public getPosition(): BoardPosition {
     return this.position;
   }
 
@@ -38,8 +37,8 @@ export class Chesspiece {
   }
 
   protected moveDirection(
-    start: ChessPosition,
-    end: ChessPosition,
+    start: BoardPosition,
+    end: BoardPosition,
   ): { x: number; y: number } {
     return {
       x: end.x > start.x ? 1 : end.x < start.x ? -1 : 0,
@@ -50,16 +49,16 @@ export class Chesspiece {
   public move(start: BoardPosition, end: BoardPosition) {
     return;
   }
-  public canMove(end: ChessPosition): boolean {
+  public canMove(end: BoardPosition): boolean {
     if (!this.basicMoveChecks(end)) return false;
     return this.canMoveTo(end);
   }
 
-  protected canMoveTo(end: ChessPosition): boolean {
+  protected canMoveTo(end: BoardPosition): boolean {
     return true;
   }
 
-  protected basicMoveChecks(end: ChessPosition): boolean {
+  protected basicMoveChecks(end: BoardPosition): boolean {
     if (this.position.x === end.x && this.position.y === end.y) return false;
     const target = this.board.getPiece(end);
     if (target && target.color === this.color) return false;
@@ -67,7 +66,7 @@ export class Chesspiece {
     return true;
   }
 
-  protected isPathClear(start: ChessPosition, end: ChessPosition): boolean {
+  protected isPathClear(start: BoardPosition, end: BoardPosition): boolean {
     if (this.isLinear(start, end)) {
       return this.lineClear(start, end);
     } else if (this.isDiagonal(start, end)) {
@@ -88,10 +87,7 @@ export class Chesspiece {
   ) {
     return Math.abs(start.x - end.x) === Math.abs(start.y - end.y);
   }
-  protected lineClear(
-    start: { x: number; y: number },
-    end: { x: number; y: number },
-  ) {
+  protected lineClear(start: BoardPosition, end: BoardPosition) {
     const dir = this.moveDirection(start, end);
     const length = Math.abs(end.x - start.x) || Math.abs(end.y - start.y);
     for (let i = 1; i < length; i++) {
@@ -106,10 +102,7 @@ export class Chesspiece {
     }
     return true;
   }
-  protected diagonalClear(
-    start: { x: number; y: number },
-    end: { x: number; y: number },
-  ) {
+  protected diagonalClear(start: BoardPosition, end: BoardPosition) {
     const dir = this.moveDirection(start, end);
     for (let i = 1; i < Math.abs(end.y - start.y); i++) {
       if (
@@ -124,13 +117,13 @@ export class Chesspiece {
     return true;
   }
 
-  setPosition(position: ChessPosition) {
+  setPosition(position: BoardPosition) {
     this.position = position;
   }
 }
 
 export class Pawn extends Chesspiece {
-  constructor(color: PieceColor, position: ChessPosition, board: ChessBoard) {
+  constructor(color: PieceColor, position: BoardPosition, board: ChessBoard) {
     super(color, position, board, "Pawn");
   }
 
@@ -148,11 +141,11 @@ export class Pawn extends Chesspiece {
   public generateMoves() {
     const p = this.getPosition();
     if (this.getColor() === PieceColor.White) {
-      if (this.canMoveTo({ x: p.x, y: p.y + 1 })) {
-        this.moves.push({ x: p.x, y: p.y + 1 });
+      if (this.canMoveTo(p.add(0, 1))) {
+        this.moves.push(p.add(0, 1));
       }
-      if (this.canMoveTo({ x: p.x, y: p.y + 2 })) {
-        this.moves.push({ x: p.x, y: p.y + 2 });
+      if (this.canMoveTo(p.add(0, 2))) {
+        this.moves.push(p.add(0, 2));
       }
     }
   }
@@ -160,7 +153,7 @@ export class Pawn extends Chesspiece {
     this.generateMoves();
     return this.moves;
   }
-  protected canMoveTo(end: ChessPosition): boolean {
+  protected canMoveTo(end: BoardPosition): boolean {
     if (this.getBoard().getPiece(end)) {
       return this.canAttack(end);
     } else {
@@ -168,7 +161,7 @@ export class Pawn extends Chesspiece {
     }
   }
 
-  private canMoveStraight(end: ChessPosition): boolean {
+  private canMoveStraight(end: BoardPosition): boolean {
     if (this.getPosition().x !== end.x) return false; //check if pawn is moving sideways
 
     if (this.getColor() === PieceColor.White) {
@@ -193,7 +186,7 @@ export class Pawn extends Chesspiece {
     }
     return true;
   }
-  private canAttack(end: ChessPosition): boolean {
+  private canAttack(end: BoardPosition): boolean {
     if (this.getColor() === PieceColor.White) {
       if (
         this.getPosition().y - end.y === -1 &&
@@ -215,11 +208,11 @@ export class Pawn extends Chesspiece {
 
 export class Rook extends Chesspiece {
   hasMoved: boolean = false;
-  constructor(color: PieceColor, position: ChessPosition, board: ChessBoard) {
+  constructor(color: PieceColor, position: BoardPosition, board: ChessBoard) {
     super(color, position, board, "Rook");
   }
 
-  protected canMoveTo(end: ChessPosition): boolean {
+  protected canMoveTo(end: BoardPosition): boolean {
     return (
       this.isLinear(this.getPosition(), end) &&
       this.lineClear(this.getPosition(), end)
@@ -232,10 +225,10 @@ export class Rook extends Chesspiece {
 }
 
 export class Knight extends Chesspiece {
-  constructor(color: PieceColor, position: ChessPosition, board: ChessBoard) {
+  constructor(color: PieceColor, position: BoardPosition, board: ChessBoard) {
     super(color, position, board, "Knight");
   }
-  protected canMoveTo(end: ChessPosition): boolean {
+  protected canMoveTo(end: BoardPosition): boolean {
     return (
       (Math.abs(this.getPosition().x - end.x) === 1 &&
         Math.abs(this.getPosition().y - end.y) === 2) ||
@@ -246,10 +239,10 @@ export class Knight extends Chesspiece {
 }
 
 export class Bishop extends Chesspiece {
-  constructor(color: PieceColor, position: ChessPosition, board: ChessBoard) {
+  constructor(color: PieceColor, position: BoardPosition, board: ChessBoard) {
     super(color, position, board, "Bishop");
   }
-  protected canMoveTo(end: ChessPosition): boolean {
+  protected canMoveTo(end: BoardPosition): boolean {
     return (
       this.isDiagonal(this.getPosition(), end) &&
       this.diagonalClear(this.getPosition(), end)
@@ -258,10 +251,10 @@ export class Bishop extends Chesspiece {
 }
 
 export class Queen extends Chesspiece {
-  constructor(color: PieceColor, position: ChessPosition, board: ChessBoard) {
+  constructor(color: PieceColor, position: BoardPosition, board: ChessBoard) {
     super(color, position, board, "Queen");
   }
-  protected canMoveTo(end: ChessPosition): boolean {
+  protected canMoveTo(end: BoardPosition): boolean {
     if (this.isLinear(this.getPosition(), end)) {
       return this.lineClear(this.getPosition(), end);
     } else if (this.isDiagonal(this.getPosition(), end)) {
@@ -273,10 +266,10 @@ export class Queen extends Chesspiece {
 
 export class King extends Chesspiece {
   hasMoved: boolean = false;
-  constructor(color: PieceColor, position: ChessPosition, board: ChessBoard) {
+  constructor(color: PieceColor, position: BoardPosition, board: ChessBoard) {
     super(color, position, board, "King");
   }
-  protected canMoveTo(end: ChessPosition): boolean {
+  protected canMoveTo(end: BoardPosition): boolean {
     return (
       Math.abs(this.getPosition().x - end.x) <= 1 &&
       Math.abs(this.getPosition().y - end.y) <= 1
