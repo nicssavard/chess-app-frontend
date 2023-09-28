@@ -1,4 +1,5 @@
 import { ChessPosition, Chessboard, Chesspiece } from "../../../typings";
+import BoardPosition from "./BoardPosition";
 import { Pawn, Rook, Knight, Bishop, Queen, King } from "./ChessPiece";
 import _ from "lodash";
 
@@ -10,9 +11,9 @@ export enum PieceColor {
 export class ChessBoard {
   board: Chessboard = []; //has to be checked with y,x  board[y][x]
   turn: PieceColor = PieceColor.White;
-  halfmoves: number = 0;
-  fullmoves: number = 1;
-  enPassant: ChessPosition | null = null;
+  halfMoves: number = 0;
+  fullMoves: number = 1;
+  enPassant: string = "-";
   check: boolean = false;
   checkmate: boolean = false;
   winner: "white" | "black" | "n" = "n";
@@ -208,8 +209,8 @@ export class ChessBoard {
     }
     fen += castle.length > 0 ? `${castle} ` : "- ";
 
-    fen += this.enPassant ? this.getSquareCode(this.enPassant) : "-";
-    fen += ` ${this.halfmoves} ${this.fullmoves}`;
+    fen += this.enPassant;
+    fen += ` ${this.halfMoves} ${this.fullMoves}`;
 
     return fen;
   }
@@ -238,7 +239,7 @@ export class ChessBoard {
     const piece = this.getPiece(start);
     if (!piece) return false;
     if (piece.getColor() !== this.turn) return false;
-    if (!piece.move(end)) return false;
+    if (!piece.canMove(end)) return false;
     if (!this.testMoveForCheck(piece, end)) return false;
     this.makeMove(start, end);
 
@@ -273,6 +274,15 @@ export class ChessBoard {
     if (piece?.getType() === "Pawn" && this.pawnPromotion(piece, end)) {
       this.promotePawn(piece);
     }
+    if (piece?.getColor() === PieceColor.Black) {
+      this.fullMoves++;
+    }
+    this.halfMoves++;
+    this.enPassant = "-";
+    piece?.move(
+      new BoardPosition(start.x, start.y),
+      new BoardPosition(end.x, end.y),
+    );
     this.changeTurn();
     this.moveHistory.push(this.getFEN());
   }
@@ -301,7 +311,7 @@ export class ChessBoard {
       color === PieceColor.White ? PieceColor.Black : PieceColor.White,
     );
     pieces.forEach((p) => {
-      if (p?.move(king!.getPosition())) {
+      if (p?.canMove(king!.getPosition())) {
         isCheck = true;
       }
     });
@@ -320,7 +330,7 @@ export class ChessBoard {
       for (let x = 0; x < 8; x++) {
         for (let y = 0; y < 8; y++) {
           const end = { x, y };
-          if (piece.move(end)) {
+          if (piece.canMove(end)) {
             if (this.testMoveForCheck(piece, end)) {
               return false;
             }

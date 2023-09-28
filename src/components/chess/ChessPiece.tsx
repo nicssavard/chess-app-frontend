@@ -47,7 +47,10 @@ export class Chesspiece {
     };
   }
 
-  public move(end: ChessPosition): boolean {
+  public move(start: BoardPosition, end: BoardPosition) {
+    return;
+  }
+  public canMove(end: ChessPosition): boolean {
     if (!this.basicMoveChecks(end)) return false;
     return this.canMoveTo(end);
   }
@@ -131,6 +134,17 @@ export class Pawn extends Chesspiece {
     super(color, position, board, "Pawn");
   }
 
+  public move(start: BoardPosition, end: BoardPosition) {
+    this.getBoard().halfMoves = 0;
+    if (Math.abs(start.y - end.y) === 2) {
+      if (this.getColor() === PieceColor.White) {
+        this.getBoard().enPassant = start.add(0, 1).toChessNotation();
+      } else {
+        this.getBoard().enPassant = start.add(0, -1).toChessNotation();
+      }
+    }
+    return;
+  }
   public generateMoves() {
     const p = this.getPosition();
     if (this.getColor() === PieceColor.White) {

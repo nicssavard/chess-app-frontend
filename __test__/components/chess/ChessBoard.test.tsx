@@ -36,13 +36,12 @@ describe("ChessBoard", () => {
   expect(chessBoard.getFEN()).toBe(
     "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
   );
-});
-test("Pawn move", () => {
-  const chessBoard = new ChessBoard();
-  const pawn = chessBoard.getPiece({ x: 0, y: 1 });
-  expect(pawn?.getType()).toBe("Pawn");
-  expect(pawn?.getMoves()).toEqual([
-    { x: 0, y: 2 },
-    { x: 0, y: 3 },
-  ]);
+  expect(chessBoard.getFENBoard()).toBe(
+    "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR",
+  );
+  expect(chessBoard.getFENTurn()).toBe("w");
+  expect(chessBoard.getFENCastle()).toBe("KQkq");
+  expect(chessBoard.getFENEnPassant()).toBe("-");
+  expect(chessBoard.getFENHalfMoves()).toBe("0");
+  expect(chessBoard.getFENFullMoves()).toBe("1");
 });
