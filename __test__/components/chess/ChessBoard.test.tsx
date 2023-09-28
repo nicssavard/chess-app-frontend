@@ -1,3 +1,4 @@
+import BoardPosition from "@/components/chess/BoardPosition";
 import { ChessBoard } from "@/components/chess/ChessBoard";
 
 describe("ChessBoard", () => {
@@ -31,17 +32,43 @@ describe("ChessBoard", () => {
     expect(chessBoard.getPiece({ x: 6, y: 7 })?.getType()).toBe("Knight");
     expect(chessBoard.getPiece({ x: 7, y: 7 })?.getType()).toBe("Rook");
   });
-  test("FEN string test", () => { });
-  const chessBoard = new ChessBoard();
-  expect(chessBoard.getFEN()).toBe(
-    "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
-  );
-  expect(chessBoard.getFENBoard()).toBe(
-    "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR",
-  );
-  expect(chessBoard.getFENTurn()).toBe("w");
-  expect(chessBoard.getFENCastle()).toBe("KQkq");
-  expect(chessBoard.getFENEnPassant()).toBe("-");
-  expect(chessBoard.getFENHalfMoves()).toBe("0");
-  expect(chessBoard.getFENFullMoves()).toBe("1");
+  test("FEN string test", () => {
+    const chessBoard = new ChessBoard();
+    expect(chessBoard.getFEN()).toBe(
+      "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+    );
+    expect(chessBoard.getFENBoard()).toBe(
+      "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR",
+    );
+    expect(chessBoard.getFENTurn()).toBe("w");
+    expect(chessBoard.getFENCastle()).toBe("KQkq");
+    expect(chessBoard.getFENEnPassant()).toBe("-");
+    expect(chessBoard.getFENHalfMoves()).toBe("0");
+    expect(chessBoard.getFENFullMoves()).toBe("1");
+  });
+
+  test("Create piece from FEN letter", () => {
+    const chessBoard = new ChessBoard();
+    expect(chessBoard.createPieceFromFENLetter("P")?.getColor()).toBe("w");
+    expect(chessBoard.createPieceFromFENLetter("p")?.getColor()).toBe("b");
+    expect(
+      chessBoard
+        .createPieceFromFENLetter("R", new BoardPosition(3, 3))
+        ?.getPosition(),
+    ).toStrictEqual(new BoardPosition(3, 3));
+    expect(chessBoard.createPieceFromFENLetter("p")?.getType()).toBe("Pawn");
+    expect(chessBoard.createPieceFromFENLetter("r")?.getType()).toBe("Rook");
+    expect(chessBoard.createPieceFromFENLetter("n")?.getType()).toBe("Knight");
+    expect(chessBoard.createPieceFromFENLetter("b")?.getType()).toBe("Bishop");
+    expect(chessBoard.createPieceFromFENLetter("q")?.getType()).toBe("Queen");
+    expect(chessBoard.createPieceFromFENLetter("k")?.getType()).toBe("King");
+  });
+  // test("generate ChessBoard from FEN code", () => {
+  //   const chessBoard = new ChessBoard(
+  //     "r1bqkbnr/pp1ppppp/2n5/2p5/3NP3/8/PPPP1PPP/RNBQKB1R b KQkq - 3 3",
+  //   );
+  //   expect(chessBoard.getFEN()).toBe(
+  //     "r1bqkbnr/pp1ppppp/2n5/2p5/3NP3/8/PPPP1PPP/RNBQKB1R b KQkq - 3 3",
+  //   );
+  // });
 });

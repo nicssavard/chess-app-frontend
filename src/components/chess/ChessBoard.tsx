@@ -143,6 +143,30 @@ export class ChessBoard {
     ];
   }
 
+  public createPieceFromFENLetter(
+    letter: string,
+    boardPosition: BoardPosition = new BoardPosition(0, 0),
+  ): Chesspiece | null {
+    const color =
+      letter === letter.toUpperCase() ? PieceColor.White : PieceColor.Black;
+    switch (letter.toLowerCase()) {
+      case "p":
+        return new Pawn(color, boardPosition, this);
+      case "r":
+        return new Rook(color, boardPosition, this);
+      case "n":
+        return new Knight(color, boardPosition, this);
+      case "b":
+        return new Bishop(color, boardPosition, this);
+      case "q":
+        return new Queen(color, boardPosition, this);
+      case "k":
+        return new King(color, boardPosition, this);
+      default:
+        return null;
+    }
+  }
+
   public getFEN(): string {
     //Not okay
     let fen = "";
