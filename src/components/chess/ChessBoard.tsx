@@ -1,6 +1,6 @@
 import { ChessPosition, Chessboard, Chesspiece } from "../../../typings";
-import BoardPosition from "./BoardPosition";
 import { Pawn, Rook, Knight, Bishop, Queen, King } from "./ChessPiece";
+import BoardPosition from "./BoardPosition";
 import _ from "lodash";
 
 export enum PieceColor {
@@ -66,81 +66,109 @@ export class ChessBoard {
   public initializeBoard(fen: string): void {
     // Populate the board with pawns
 
-    this.alivePieces.push(
-      this.wPawn1,
-      this.wPawn2,
-      this.wPawn3,
-      this.wPawn4,
-      this.wPawn5,
-      this.wPawn6,
-      this.wPawn7,
-      this.wPawn8,
-      this.bPawn1,
-      this.bPawn2,
-      this.bPawn3,
-      this.bPawn4,
-      this.bPawn5,
-      this.bPawn6,
-      this.bPawn7,
-      this.bPawn8,
-      this.wRook1,
-      this.wRook2,
-      this.bRook1,
-      this.bRook2,
-      this.wKnight1,
-      this.wKnight2,
-      this.bKnight1,
-      this.bKnight2,
-      this.wBishop1,
-      this.wBishop2,
-      this.bBishop1,
-      this.bBishop2,
-      this.wQueen,
-      this.bQueen,
-      this.wKing,
-      this.bKing,
-    );
+    // this.alivePieces.push(
+    //   this.wPawn1,
+    //   this.wPawn2,
+    //   this.wPawn3,
+    //   this.wPawn4,
+    //   this.wPawn5,
+    //   this.wPawn6,
+    //   this.wPawn7,
+    //   this.wPawn8,
+    //   this.bPawn1,
+    //   this.bPawn2,
+    //   this.bPawn3,
+    //   this.bPawn4,
+    //   this.bPawn5,
+    //   this.bPawn6,
+    //   this.bPawn7,
+    //   this.bPawn8,
+    //   this.wRook1,
+    //   this.wRook2,
+    //   this.bRook1,
+    //   this.bRook2,
+    //   this.wKnight1,
+    //   this.wKnight2,
+    //   this.bKnight1,
+    //   this.bKnight2,
+    //   this.wBishop1,
+    //   this.wBishop2,
+    //   this.bBishop1,
+    //   this.bBishop2,
+    //   this.wQueen,
+    //   this.bQueen,
+    //   this.wKing,
+    //   this.bKing,
+    // );
+    //
+    // this.board[0] = [
+    //   this.wRook1,
+    //   this.wKnight1,
+    //   this.wBishop1,
+    //   this.wQueen,
+    //   this.wKing,
+    //   this.wBishop2,
+    //   this.wKnight2,
+    //   this.wRook2,
+    // ];
+    // this.board[1] = [
+    //   this.wPawn1,
+    //   this.wPawn2,
+    //   this.wPawn3,
+    //   this.wPawn4,
+    //   this.wPawn5,
+    //   this.wPawn6,
+    //   this.wPawn7,
+    //   this.wPawn8,
+    // ];
+    // this.board[6] = [
+    //   this.bPawn1,
+    //   this.bPawn2,
+    //   this.bPawn3,
+    //   this.bPawn4,
+    //   this.bPawn5,
+    //   this.bPawn6,
+    //   this.bPawn7,
+    //   this.bPawn8,
+    // ];
+    // this.board[7] = [
+    //   this.bRook1,
+    //   this.bKnight1,
+    //   this.bBishop1,
+    //   this.bQueen,
+    //   this.bKing,
+    //   this.bBishop2,
+    //   this.bKnight2,
+    //   this.bRook2,
+    // ];
 
-    this.board[0] = [
-      this.wRook1,
-      this.wKnight1,
-      this.wBishop1,
-      this.wQueen,
-      this.wKing,
-      this.wBishop2,
-      this.wKnight2,
-      this.wRook2,
-    ];
-    this.board[1] = [
-      this.wPawn1,
-      this.wPawn2,
-      this.wPawn3,
-      this.wPawn4,
-      this.wPawn5,
-      this.wPawn6,
-      this.wPawn7,
-      this.wPawn8,
-    ];
-    this.board[6] = [
-      this.bPawn1,
-      this.bPawn2,
-      this.bPawn3,
-      this.bPawn4,
-      this.bPawn5,
-      this.bPawn6,
-      this.bPawn7,
-      this.bPawn8,
-    ];
-    this.board[7] = [
-      this.bRook1,
-      this.bKnight1,
-      this.bBishop1,
-      this.bQueen,
-      this.bKing,
-      this.bBishop2,
-      this.bKnight2,
-      this.bRook2,
-    ];
+    const fenBoard = fen.split(" ")[0];
+    const fenRows = fenBoard.split("/");
+    for (let i = 0; i < fenRows.length; i++) {
+      const row = fenRows[i];
+      let x = 0;
+      for (let j = 0; j < row.length; j++) {
+        const letter = row[j];
+        if (isNaN(Number(letter))) {
+          const piece = this.createPieceFromFENLetter(
+            letter,
+            new BoardPosition(x, 7 - i),
+          );
+          if (piece) {
+            this.setPieceAt({ x, y: 7 - i }, piece);
+            this.alivePieces.push(piece);
+          }
+          x++;
+        } else {
+          x += Number(letter);
+        }
+      }
+    }
+
+    this.turn = fen.split(" ")[1] === "w" ? PieceColor.White : PieceColor.Black;
+    this.enPassant = fen.split(" ")[3];
+    this.halfMoves = Number(fen.split(" ")[4]);
+    this.fullMoves = Number(fen.split(" ")[5]);
   }
 
   public createPieceFromFENLetter(
@@ -161,7 +189,13 @@ export class ChessBoard {
       case "q":
         return new Queen(color, boardPosition, this);
       case "k":
-        return new King(color, boardPosition, this);
+        if (color === PieceColor.White) {
+          this.wKing = new King(color, boardPosition, this);
+          return this.wKing;
+        } else {
+          this.bKing = new King(color, boardPosition, this);
+          return this.bKing;
+        }
       default:
         return null;
     }

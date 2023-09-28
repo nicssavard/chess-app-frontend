@@ -73,9 +73,8 @@ export default function Game() {
             {board && (
               <Board
                 board={board}
-                className={`rounded-2xl relative overflow-hidden border-4 ${
-                  turn === "w" ? "border-white" : "border-black"
-                }`}
+                className={`rounded-2xl relative overflow-hidden border-4 ${turn === "w" ? "border-white" : "border-black"
+                  }`}
               />
             )}
           </div>

@@ -63,12 +63,15 @@ describe("ChessBoard", () => {
     expect(chessBoard.createPieceFromFENLetter("q")?.getType()).toBe("Queen");
     expect(chessBoard.createPieceFromFENLetter("k")?.getType()).toBe("King");
   });
-  // test("generate ChessBoard from FEN code", () => {
-  //   const chessBoard = new ChessBoard(
-  //     "r1bqkbnr/pp1ppppp/2n5/2p5/3NP3/8/PPPP1PPP/RNBQKB1R b KQkq - 3 3",
-  //   );
-  //   expect(chessBoard.getFEN()).toBe(
-  //     "r1bqkbnr/pp1ppppp/2n5/2p5/3NP3/8/PPPP1PPP/RNBQKB1R b KQkq - 3 3",
-  //   );
-  // });
+  test("generate ChessBoard from FEN code", () => {
+    const chessBoard = new ChessBoard(
+      "r1bqkbnr/pp1ppppp/2n5/2p5/3NP3/8/PPPP1PPP/RNBQKB1R b KQkq - 3 3",
+    );
+    expect(chessBoard.getFEN()).toBe(
+      "r1bqkbnr/pp1ppppp/2n5/2p5/3NP3/8/PPPP1PPP/RNBQKB1R b KQkq - 3 3",
+    );
+    expect(chessBoard.wKing.getPosition()).toStrictEqual(
+      new BoardPosition(4, 0),
+    );
+  });
 });
