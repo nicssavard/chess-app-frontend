@@ -2,7 +2,7 @@ import { ChessPosition, Chessboard, Chesspiece } from "../../../typings";
 import { Pawn, Rook, Knight, Bishop, Queen, King } from "./ChessPiece";
 import _ from "lodash";
 
-enum PieceColor {
+export enum PieceColor {
   White = "w",
   Black = "b",
 }
@@ -214,10 +214,27 @@ export class ChessBoard {
     return fen;
   }
 
+  public getFENBoard() {
+    return this.getFEN().split(" ")[0];
+  }
+  public getFENTurn() {
+    return this.getFEN().split(" ")[1];
+  }
+
+  public getFENCastle() {
+    return this.getFEN().split(" ")[2];
+  }
+  public getFENEnPassant() {
+    return this.getFEN().split(" ")[3];
+  }
+  public getFENHalfMoves() {
+    return this.getFEN().split(" ")[4];
+  }
+  public getFENFullMoves() {
+    return this.getFEN().split(" ")[5];
+  }
+
   public move(start: ChessPosition, end: ChessPosition): false | Chessboard {
-    console.log("move");
-    console.log("x: ", start.x, "y: ", start.y);
-    console.log(this.getSquareCode(start));
     const piece = this.getPiece(start);
     if (!piece) return false;
     if (piece.getColor() !== this.turn) return false;
@@ -234,7 +251,7 @@ export class ChessBoard {
     } else {
       this.check = false;
     }
-    this.printBoard();
+    // this.printBoard();
     return this.board.map((row: (Chesspiece | null)[]) =>
       row.slice(),
     ) as Chessboard;

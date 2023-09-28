@@ -1,10 +1,8 @@
 import { ChessPosition } from "../../../typings";
 import { ChessBoard } from "./ChessBoard";
 import BoardPosition from "./BoardPosition";
-enum PieceColor {
-  White = "w",
-  Black = "b",
-}
+import { PieceColor } from "./ChessBoard";
+
 export class Chesspiece {
   private color: PieceColor;
   private position: ChessPosition;
