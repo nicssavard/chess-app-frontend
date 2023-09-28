@@ -1,5 +1,6 @@
 import { ChessPosition } from "../../../typings";
 import { ChessBoard } from "./ChessBoard";
+import BoardPosition from "./BoardPosition";
 enum PieceColor {
   White = "w",
   Black = "b",
