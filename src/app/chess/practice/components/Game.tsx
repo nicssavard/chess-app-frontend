@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
-import { DndContext, DragEndEvent, UniqueIdentifier } from "@dnd-kit/core";
+import {
+  DndContext,
+  DragEndEvent,
+  DragStartEvent,
+  UniqueIdentifier,
+} from "@dnd-kit/core";
 import Board from "./Board";
 import BoardPosition from "@/components/chess/BoardPosition";
 import { ChessBoard } from "@/components/chess/ChessBoard";
@@ -45,6 +50,11 @@ export default function Game() {
     }
     setIsCheckMate(chessBoard.checkmate);
   };
+
+  const handleDragStart = (event: DragStartEvent) => {
+    console.log("piece lifted");
+    // chessBoard?.getPiece(idToLocation(e))
+  };
   return (
     <>
       <div className="flex h-20 flex-row justify-center ">
@@ -69,7 +79,7 @@ export default function Game() {
               );
             })}
         </div> */}
-        <DndContext onDragEnd={handleDragEnd}>
+        <DndContext onDragEnd={handleDragEnd} onDragStart={handleDragStart}>
           <div className="flex flex-col">
             {board && (
               <Board

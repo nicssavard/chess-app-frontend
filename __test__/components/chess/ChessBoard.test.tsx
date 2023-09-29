@@ -31,6 +31,7 @@ describe("ChessBoard", () => {
     expect(chessBoard.getPiece({ x: 5, y: 7 })?.getType()).toBe("Bishop");
     expect(chessBoard.getPiece({ x: 6, y: 7 })?.getType()).toBe("Knight");
     expect(chessBoard.getPiece({ x: 7, y: 7 })?.getType()).toBe("Rook");
+    expect(chessBoard.getAlivePieces().length).toBe(32);
   });
   test("FEN string test", () => {
     const chessBoard = new ChessBoard();
@@ -63,15 +64,26 @@ describe("ChessBoard", () => {
     expect(chessBoard.createPieceFromFENLetter("q")?.getType()).toBe("Queen");
     expect(chessBoard.createPieceFromFENLetter("k")?.getType()).toBe("King");
   });
-  test("generate ChessBoard from FEN code", () => {
+  test("Create ChessBoard from FEN code", () => {
     const chessBoard = new ChessBoard(
-      "r1bqkbnr/pp1ppppp/2n5/2p5/3NP3/8/PPPP1PPP/RNBQKB1R b KQkq - 3 3",
+      "r1bqkbnr/pp1ppppp/8/2p5/2PnP3/8/PP1P1PPP/RNBQKB1R b KQkq c3 0 4",
     );
     expect(chessBoard.getFEN()).toBe(
-      "r1bqkbnr/pp1ppppp/2n5/2p5/3NP3/8/PPPP1PPP/RNBQKB1R b KQkq - 3 3",
+      "r1bqkbnr/pp1ppppp/8/2p5/2PnP3/8/PP1P1PPP/RNBQKB1R b KQkq c3 0 4",
     );
+
     expect(chessBoard.wKing.getPosition()).toStrictEqual(
       new BoardPosition(4, 0),
     );
+    expect(chessBoard.getAlivePieces().length).toBe(31);
+    expect(chessBoard.getDeadPieces().length).toBe(1);
+
+    chessBoard.move(new BoardPosition(3, 3), new BoardPosition(2, 1));
+    chessBoard.move(new BoardPosition(3, 0), new BoardPosition(2, 1));
+    expect(chessBoard.getFEN()).toBe(
+      "r1bqkbnr/pp1ppppp/8/2p5/2P1P3/8/PPQP1PPP/RNB1KB1R b KQkq - 0 5",
+    );
+    expect(chessBoard.getAlivePieces().length).toBe(30);
+    expect(chessBoard.getDeadPieces().length).toBe(2);
   });
 });

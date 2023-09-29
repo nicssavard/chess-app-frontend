@@ -17,6 +17,7 @@ export class ChessBoard {
   check: boolean = false;
   checkmate: boolean = false;
   winner: "white" | "black" | "n" = "n";
+  pieces: string = "rnbqkbnrppppppppPPPPPPPPRNBQKBNR";
   alivePieces: Chesspiece[] = [];
   deadPieces: Chesspiece[] = [];
   moveHistory: string[] = []; //FEN notation
@@ -142,6 +143,7 @@ export class ChessBoard {
     //   this.bRook2,
     // ];
 
+    let pieces = this.pieces;
     const fenBoard = fen.split(" ")[0];
     const fenRows = fenBoard.split("/");
     for (let i = 0; i < fenRows.length; i++) {
@@ -156,6 +158,7 @@ export class ChessBoard {
           );
           if (piece) {
             this.setPieceAt(new BoardPosition(x, 7 - i), piece);
+            pieces = pieces.replace(letter, "");
             this.alivePieces.push(piece);
           }
           x++;
@@ -163,6 +166,14 @@ export class ChessBoard {
           x += Number(letter);
         }
       }
+    }
+    for (let i = 0; i < pieces.length; i++) {
+      const letter = pieces[i];
+      const piece = this.createPieceFromFENLetter(
+        letter,
+        new BoardPosition(0, 0),
+      );
+      this.deadPieces.push(piece!);
     }
 
     this.turn = fen.split(" ")[1] === "w" ? PieceColor.White : PieceColor.Black;
@@ -319,12 +330,6 @@ export class ChessBoard {
   public makeMove(start: BoardPosition, end: BoardPosition): void {
     let piece = this.getPiece(start);
     const deadPiece = this.getPiece(end);
-    if (deadPiece) {
-      this.deadPieces.push(deadPiece);
-      this.alivePieces = this.alivePieces.filter(
-        (piece) => piece !== deadPiece,
-      );
-    }
 
     this.setPieceAt(end, piece);
     this.setPieceAt(start, null);
@@ -341,6 +346,14 @@ export class ChessBoard {
       new BoardPosition(start.x, start.y),
       new BoardPosition(end.x, end.y),
     );
+
+    if (deadPiece) {
+      this.halfMoves = 0;
+      this.deadPieces.push(deadPiece);
+      this.alivePieces = this.alivePieces.filter(
+        (piece) => piece !== deadPiece,
+      );
+    }
     this.changeTurn();
     this.moveHistory.push(this.getFEN());
   }
@@ -444,9 +457,18 @@ export class ChessBoard {
     console.log(_.cloneDeep(this.board).reverse());
   }
 
+  public getAlivePieces() {
+    return this.alivePieces;
+  }
+
   public setAlivePieces(pieces: Chesspiece[]): void {
     this.alivePieces = pieces;
   }
+
+  public getDeadPieces() {
+    return this.deadPieces;
+  }
+
   promotePawn(piece: Chesspiece): void {
     const queen = new Queen(piece.getColor(), piece.getPosition(), this);
     this.setPieceAt(piece.getPosition(), queen);
