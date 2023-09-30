@@ -26,6 +26,11 @@ export default function Game() {
   const [isCheck, setIsCheck] = useState<boolean>(false);
   const [isCheckMate, setIsCheckMate] = useState<boolean>(false);
   const [win, setWin] = useState<"white" | "black" | "n">("n");
+  const [possibleMoves, setPossibleMoves] = useState(
+    Array(8)
+      .fill(0)
+      .map(() => Array(8).fill("")),
+  );
   useEffect(() => {
     const test = new ChessBoard();
     setChessBoard(test);
@@ -33,6 +38,9 @@ export default function Game() {
   }, []);
 
   const handleDragEnd = (event: DragEndEvent) => {
+    const newPossibleMoves = possibleMoves.map((row) => [...row]);
+    newPossibleMoves.forEach((row) => row.fill(false));
+    setPossibleMoves(newPossibleMoves);
     //make sure that the drag is valid
     if (!chessBoard) return;
     if (event.over == null || event.active == null) return;
@@ -52,8 +60,21 @@ export default function Game() {
   };
 
   const handleDragStart = (event: DragStartEvent) => {
-    console.log("piece lifted");
-    // chessBoard?.getPiece(idToLocation(e))
+    if (event.active == null) return;
+    const piece = chessBoard?.getPiece(idToLocation(event.active?.id));
+    if (!piece) return;
+    const moves = piece.getMoves();
+    const attacks = piece.getAttacks();
+
+    if (!moves || !attacks) return;
+    const newPossibleMoves = possibleMoves.map((row) => [...row]);
+    moves.forEach((move: BoardPosition) => {
+      newPossibleMoves[move.y][move.x] = "move";
+    });
+    attacks.forEach((attack: BoardPosition) => {
+      newPossibleMoves[attack.y][attack.x] = "attack";
+    });
+    setPossibleMoves(newPossibleMoves);
   };
   return (
     <>
@@ -84,6 +105,7 @@ export default function Game() {
             {board && (
               <Board
                 board={board}
+                possibleMoves={possibleMoves}
                 className={`rounded-2xl relative overflow-hidden border-4 ${turn === "w" ? "border-white" : "border-black"
                   }`}
               />

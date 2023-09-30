@@ -184,8 +184,6 @@ export class Pawn extends Chesspiece {
     this.possibleMoves.push(move);
   }
   public addAttack(attack: BoardPosition) {
-    console.log("addAttack");
-    console.log(attack);
     this.possibleAttacks.push(attack);
   }
 
@@ -208,6 +206,7 @@ export class Pawn extends Chesspiece {
 
   private canMoveStraight(end: BoardPosition): boolean {
     if (this.getPosition().x !== end.x) return false; //check if pawn is moving sideways
+    if (this.getBoard().getPiece(end)) return false; //check if there is a piece in the way
 
     if (this.getColor() === PieceColor.White) {
       if (this.getPosition().y === 1 && end.y === 3) {
