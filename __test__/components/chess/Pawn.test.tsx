@@ -3,27 +3,28 @@ import { Pawn } from "@/components/chess/ChessPiece";
 import BoardPosition from "@/components/chess/BoardPosition";
 
 describe("Pawn", () => {
-  test("Pawn initial moves", () => {
-    const chessBoard = new ChessBoard();
-    const pawn: Pawn = chessBoard.getPiece({ x: 0, y: 1 }) as Pawn;
+  test("Pawn moves 1,2 and attack", () => {
+    const chessBoard = new ChessBoard(
+      "r1bqkbnr/pppp1ppp/2n5/3Pp3/8/8/PPP1PPPP/RNBQKBNR w KQkq e6 0 3",
+    );
 
-    expect(pawn?.getType()).toBe("Pawn");
-    expect(pawn?.getMoves()).toEqual([
-      { x: 0, y: 2 },
-      { x: 0, y: 3 },
+    const pawn2Squares: Pawn = chessBoard.getPiece(
+      new BoardPosition(0, 1),
+    ) as Pawn;
+    //test for initial 2 squares moves
+    expect(pawn2Squares.getMoves()).toStrictEqual([
+      new BoardPosition(0, 2),
+      new BoardPosition(0, 3),
     ]);
-  });
-  test("Pawn moves 2  squares", () => {
-    const chessBoard = new ChessBoard();
-    const pawn: Pawn = chessBoard.getPiece({ x: 1, y: 1 }) as Pawn;
-    chessBoard.move({ x: 1, y: 1 }, { x: 1, y: 3 });
-    expect(pawn.getPosition()).toEqual({ x: 1, y: 3 });
-    expect(chessBoard.getFEN()).toBe(
-      "rnbqkbnr/pppppppp/8/8/1P6/8/P1PPPPPP/RNBQKBNR b KQkq b3 0 1",
-    );
-    chessBoard.move({ x: 1, y: 7 }, { x: 2, y: 5 });
-    expect(chessBoard.getFEN()).toBe(
-      "r1bqkbnr/pppppppp/2n5/8/1P6/8/P1PPPPPP/RNBQKBNR w KQkq - 1 2",
-    );
+    expect(pawn2Squares.getAttacks()).toStrictEqual([]);
+
+    //test move, attack and enPassant
+    const pawn: Pawn = chessBoard.getPiece(new BoardPosition(3, 4)) as Pawn;
+    expect(pawn?.getType()).toBe("Pawn");
+    expect(pawn.getMoves()).toStrictEqual([new BoardPosition(3, 5)]);
+    expect(pawn.getAttacks()).toStrictEqual([
+      new BoardPosition(4, 5),
+      new BoardPosition(2, 5),
+    ]);
   });
 });

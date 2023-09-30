@@ -7,7 +7,8 @@ export class Chesspiece {
   private position: BoardPosition;
   private board: ChessBoard;
   private type: string;
-  public moves: BoardPosition[] = [];
+  public possibleMoves: BoardPosition[] = [];
+  public possibleAttacks: BoardPosition[] = [];
   constructor(
     color: PieceColor,
     position: BoardPosition,
@@ -138,27 +139,71 @@ export class Pawn extends Chesspiece {
     }
     return;
   }
-  public generateMoves() {
-    const p = this.getPosition();
-    if (this.getColor() === PieceColor.White) {
-      if (this.canMoveTo(p.add(0, 1))) {
-        this.moves.push(p.add(0, 1));
-      }
-      if (this.canMoveTo(p.add(0, 2))) {
-        this.moves.push(p.add(0, 2));
-      }
-    }
+
+  public clearMoves() {
+    this.possibleMoves = [];
+    this.possibleAttacks = [];
   }
+  public generateMoves() {
+    this.clearMoves();
+    const p = this.getPosition();
+    const dir = this.getColor() === PieceColor.White ? 1 : -1;
+    this.canMoveTo(p.add(0, dir));
+    this.canMoveTo(p.add(0, dir * 2));
+    this.canAttack(p.add(1, dir));
+    this.canAttack(p.add(-1, dir));
+    // if (this.getColor() === PieceColor.White) {
+    //   if (this.canMoveTo(p.add(0, 1))) {
+    //     this.possibleMoves.push(p.add(0, 1));
+    //   }
+    //   if (this.canMoveTo(p.add(0, 2))) {
+    //     this.possibleMoves.push(p.add(0, 2));
+    //   }
+    //   if (this.canAttack(p.add(1, 1))) {
+    //     this.addAttack(p.add(1, 1));
+    //   }
+    //   if (this.canAttack(p.add(-1, 1))) {
+    //     this.addAttack(p.add(-1, 1));
+    //   }
+    // } else {
+    //   if (this.canMoveTo(p.add(0, -1))) {
+    //     this.possibleMoves.push(p.add(0, -1));
+    //   }
+    //   if (this.canMoveTo(p.add(0, -2))) {
+    //     this.possibleMoves.push(p.add(0, -2));
+    //   }
+    //   if (this.canAttack(p.add(1, -1))) {
+    //     this.addAttack(p.add(1, -1));
+    //   }
+    //   if (this.canAttack(p.add(-1, -1))) {
+    //     this.addAttack(p.add(-1, -1));
+    //   }
+    // }
+  }
+  public addMove(move: BoardPosition) {
+    this.possibleMoves.push(move);
+  }
+  public addAttack(attack: BoardPosition) {
+    console.log("addAttack");
+    console.log(attack);
+    this.possibleAttacks.push(attack);
+  }
+
   public getMoves() {
     this.generateMoves();
-    return this.moves;
+    return this.possibleMoves;
   }
+  public getAttacks() {
+    this.generateMoves();
+    return this.possibleAttacks;
+  }
+
   protected canMoveTo(end: BoardPosition): boolean {
-    if (this.getBoard().getPiece(end)) {
-      return this.canAttack(end);
-    } else {
-      return this.canMoveStraight(end);
+    if (this.canMoveStraight(end)) {
+      this.addMove(end);
+      return true;
     }
+    return false;
   }
 
   private canMoveStraight(end: BoardPosition): boolean {
@@ -187,21 +232,32 @@ export class Pawn extends Chesspiece {
     return true;
   }
   private canAttack(end: BoardPosition): boolean {
-    if (this.getColor() === PieceColor.White) {
-      if (
-        this.getPosition().y - end.y === -1 &&
-        Math.abs(this.getPosition().x - end.x) === 1
-      ) {
-        return true;
-      }
-    } else if (this.getColor() === PieceColor.Black) {
-      if (
-        this.getPosition().y - end.y === 1 &&
-        Math.abs(this.getPosition().x - end.x) === 1
-      ) {
-        return true;
-      }
+    if (
+      this.getBoard().getPiece(end) &&
+      this.getColor() != this.getBoard().getPiece(end)?.getColor()
+    ) {
+      this.addAttack(end);
+      return true;
     }
+    if (this.getBoard().enPassant === end.toChessNotation()) {
+      this.addAttack(end);
+      return true;
+    }
+    //   if (this.getColor() === PieceColor.White) {
+    //     if (
+    //       this.getPosition().y - end.y === -1 &&
+    //       Math.abs(this.getPosition().x - end.x) === 1
+    //     ) {
+    //       return true;
+    //     }
+    //   } else if (this.getColor() === PieceColor.Black) {
+    //     if (
+    //       this.getPosition().y - end.y === 1 &&
+    //       Math.abs(this.getPosition().x - end.x) === 1
+    //     ) {
+    //       return true;
+    //     }
+    //   }
     return false;
   }
 }

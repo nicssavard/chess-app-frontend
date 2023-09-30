@@ -21,6 +21,9 @@ export class ChessBoard {
   alivePieces: Chesspiece[] = [];
   deadPieces: Chesspiece[] = [];
   moveHistory: string[] = []; //FEN notation
+  // possibleMoves: ChessPosition[] = [];
+  // possibleAttacks: ChessPosition[] = [];
+
   // wPawn1: Pawn = new Pawn(PieceColor.White, { x: 0, y: 1 }, this);
   // wPawn2: Pawn = new Pawn(PieceColor.White, { x: 1, y: 1 }, this);
   // wPawn3: Pawn = new Pawn(PieceColor.White, { x: 2, y: 1 }, this);
