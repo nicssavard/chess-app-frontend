@@ -17,6 +17,9 @@ export default class BoardPosition {
     this.x = x;
     this.y = y;
   }
+  public isOnBoard(): boolean {
+    return this.x >= 0 && this.x <= 7 && this.y >= 0 && this.y <= 7;
+  }
 
   public equals(other: BoardPosition): boolean {
     return this.x === other.x && this.y === other.y;

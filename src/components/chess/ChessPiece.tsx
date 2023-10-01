@@ -21,22 +21,6 @@ export class Chesspiece {
     this.type = type;
   }
 
-  public getColor(): PieceColor {
-    return this.color;
-  }
-
-  public getPosition(): BoardPosition {
-    return this.position;
-  }
-
-  public getBoard(): ChessBoard {
-    return this.board;
-  }
-
-  public getType(): string {
-    return this.type;
-  }
-
   protected moveDirection(
     start: BoardPosition,
     end: BoardPosition,
@@ -47,17 +31,20 @@ export class Chesspiece {
     };
   }
 
-  public move(start: BoardPosition, end: BoardPosition) {
+  public move(end: BoardPosition) {
+    console.log("move");
     return;
   }
-  public canMove(end: BoardPosition): boolean {
-    if (!this.basicMoveChecks(end)) return false;
-    return this.canMoveTo(end);
+  public attack(end: BoardPosition) {
+    console.log("attack");
+    return;
   }
+  // public canMove(end: BoardPosition): boolean {
+  //   if (!this.basicMoveChecks(end)) return false;
+  //   return this.canMoveTo(end);
+  // }
 
-  protected canMoveTo(end: BoardPosition): boolean {
-    return true;
-  }
+  public generateMoves() { }
 
   protected basicMoveChecks(end: BoardPosition): boolean {
     if (this.position.x === end.x && this.position.y === end.y) return false;
@@ -121,6 +108,37 @@ export class Chesspiece {
   setPosition(position: BoardPosition) {
     this.position = position;
   }
+  public getColor(): PieceColor {
+    return this.color;
+  }
+
+  public getPosition(): BoardPosition {
+    return this.position;
+  }
+
+  public getBoard(): ChessBoard {
+    return this.board;
+  }
+
+  public getType(): string {
+    return this.type;
+  }
+
+  public canMoveTo(end: BoardPosition): boolean {
+    return this.possibleMoves.some((move) => move.equals(end));
+  }
+
+  public canAttackTo(end: BoardPosition): boolean {
+    return this.possibleAttacks.some((attack) => attack.equals(end));
+  }
+  public getMoves() {
+    this.generateMoves();
+    return this.possibleMoves;
+  }
+  public getAttacks() {
+    this.generateMoves();
+    return this.possibleAttacks;
+  }
 }
 
 export class Pawn extends Chesspiece {
@@ -128,7 +146,9 @@ export class Pawn extends Chesspiece {
     super(color, position, board, "Pawn");
   }
 
-  public move(start: BoardPosition, end: BoardPosition) {
+  public move(end: BoardPosition) {
+    const start = this.getPosition();
+    this.getBoard().movePiece(this, end);
     this.getBoard().halfMoves = 0;
     if (Math.abs(start.y - end.y) === 2) {
       if (this.getColor() === PieceColor.White) {
@@ -137,6 +157,19 @@ export class Pawn extends Chesspiece {
         this.getBoard().enPassant = start.add(0, -1).toChessNotation();
       }
     }
+    return;
+  }
+  public attack(end: BoardPosition) {
+    const start = this.getPosition();
+    if (this.getBoard().enPassant === end.toChessNotation()) {
+      this.getBoard().killPiece(
+        end.add(0, this.getColor() === PieceColor.White ? -1 : 1),
+      );
+    } else {
+      this.getBoard().killPiece(end);
+    }
+    this.getBoard().movePiece(this, end);
+    this.getBoard().halfMoves = 0;
     return;
   }
 
@@ -152,33 +185,6 @@ export class Pawn extends Chesspiece {
     this.canMoveTo(p.add(0, dir * 2));
     this.canAttack(p.add(1, dir));
     this.canAttack(p.add(-1, dir));
-    // if (this.getColor() === PieceColor.White) {
-    //   if (this.canMoveTo(p.add(0, 1))) {
-    //     this.possibleMoves.push(p.add(0, 1));
-    //   }
-    //   if (this.canMoveTo(p.add(0, 2))) {
-    //     this.possibleMoves.push(p.add(0, 2));
-    //   }
-    //   if (this.canAttack(p.add(1, 1))) {
-    //     this.addAttack(p.add(1, 1));
-    //   }
-    //   if (this.canAttack(p.add(-1, 1))) {
-    //     this.addAttack(p.add(-1, 1));
-    //   }
-    // } else {
-    //   if (this.canMoveTo(p.add(0, -1))) {
-    //     this.possibleMoves.push(p.add(0, -1));
-    //   }
-    //   if (this.canMoveTo(p.add(0, -2))) {
-    //     this.possibleMoves.push(p.add(0, -2));
-    //   }
-    //   if (this.canAttack(p.add(1, -1))) {
-    //     this.addAttack(p.add(1, -1));
-    //   }
-    //   if (this.canAttack(p.add(-1, -1))) {
-    //     this.addAttack(p.add(-1, -1));
-    //   }
-    // }
   }
   public addMove(move: BoardPosition) {
     this.possibleMoves.push(move);
@@ -187,16 +193,8 @@ export class Pawn extends Chesspiece {
     this.possibleAttacks.push(attack);
   }
 
-  public getMoves() {
-    this.generateMoves();
-    return this.possibleMoves;
-  }
-  public getAttacks() {
-    this.generateMoves();
-    return this.possibleAttacks;
-  }
-
-  protected canMoveTo(end: BoardPosition): boolean {
+  public canMoveTo(end: BoardPosition): boolean {
+    if (!end.isOnBoard()) return false;
     if (this.canMoveStraight(end)) {
       this.addMove(end);
       return true;
@@ -230,7 +228,8 @@ export class Pawn extends Chesspiece {
     }
     return true;
   }
-  private canAttack(end: BoardPosition): boolean {
+  public canAttack(end: BoardPosition): boolean {
+    if (!end.isOnBoard()) return false;
     if (
       this.getBoard().getPiece(end) &&
       this.getColor() != this.getBoard().getPiece(end)?.getColor()

@@ -57,6 +57,7 @@ export default function Game() {
       setWin(chessBoard.winner);
     }
     setIsCheckMate(chessBoard.checkmate);
+    console.log(chessBoard);
   };
 
   const handleDragStart = (event: DragStartEvent) => {

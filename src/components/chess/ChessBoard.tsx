@@ -1,7 +1,7 @@
 import { ChessPosition, Chessboard, Chesspiece } from "../../../typings";
 import { Pawn, Rook, Knight, Bishop, Queen, King } from "./ChessPiece";
 import BoardPosition from "./BoardPosition";
-import _ from "lodash";
+import _, { forEach } from "lodash";
 
 export enum PieceColor {
   White = "w",
@@ -21,9 +21,9 @@ export class ChessBoard {
   alivePieces: Chesspiece[] = [];
   deadPieces: Chesspiece[] = [];
   moveHistory: string[] = []; //FEN notation
-  // possibleMoves: ChessPosition[] = [];
-  // possibleAttacks: ChessPosition[] = [];
-
+  possibleMoves: ChessPosition[] = [];
+  possibleAttacks: ChessPosition[] = [];
+  FEN: string = "";
   // wPawn1: Pawn = new Pawn(PieceColor.White, { x: 0, y: 1 }, this);
   // wPawn2: Pawn = new Pawn(PieceColor.White, { x: 1, y: 1 }, this);
   // wPawn3: Pawn = new Pawn(PieceColor.White, { x: 2, y: 1 }, this);
@@ -69,82 +69,6 @@ export class ChessBoard {
 
   public initializeBoard(fen: string): void {
     // Populate the board with pawns
-
-    // this.alivePieces.push(
-    //   this.wPawn1,
-    //   this.wPawn2,
-    //   this.wPawn3,
-    //   this.wPawn4,
-    //   this.wPawn5,
-    //   this.wPawn6,
-    //   this.wPawn7,
-    //   this.wPawn8,
-    //   this.bPawn1,
-    //   this.bPawn2,
-    //   this.bPawn3,
-    //   this.bPawn4,
-    //   this.bPawn5,
-    //   this.bPawn6,
-    //   this.bPawn7,
-    //   this.bPawn8,
-    //   this.wRook1,
-    //   this.wRook2,
-    //   this.bRook1,
-    //   this.bRook2,
-    //   this.wKnight1,
-    //   this.wKnight2,
-    //   this.bKnight1,
-    //   this.bKnight2,
-    //   this.wBishop1,
-    //   this.wBishop2,
-    //   this.bBishop1,
-    //   this.bBishop2,
-    //   this.wQueen,
-    //   this.bQueen,
-    //   this.wKing,
-    //   this.bKing,
-    // );
-    //
-    // this.board[0] = [
-    //   this.wRook1,
-    //   this.wKnight1,
-    //   this.wBishop1,
-    //   this.wQueen,
-    //   this.wKing,
-    //   this.wBishop2,
-    //   this.wKnight2,
-    //   this.wRook2,
-    // ];
-    // this.board[1] = [
-    //   this.wPawn1,
-    //   this.wPawn2,
-    //   this.wPawn3,
-    //   this.wPawn4,
-    //   this.wPawn5,
-    //   this.wPawn6,
-    //   this.wPawn7,
-    //   this.wPawn8,
-    // ];
-    // this.board[6] = [
-    //   this.bPawn1,
-    //   this.bPawn2,
-    //   this.bPawn3,
-    //   this.bPawn4,
-    //   this.bPawn5,
-    //   this.bPawn6,
-    //   this.bPawn7,
-    //   this.bPawn8,
-    // ];
-    // this.board[7] = [
-    //   this.bRook1,
-    //   this.bKnight1,
-    //   this.bBishop1,
-    //   this.bQueen,
-    //   this.bKing,
-    //   this.bBishop2,
-    //   this.bKnight2,
-    //   this.bRook2,
-    // ];
 
     let pieces = this.pieces;
     const fenBoard = fen.split(" ")[0];
@@ -216,7 +140,6 @@ export class ChessBoard {
   }
 
   public getFEN(): string {
-    //Not okay
     let fen = "";
     for (let i = 0; i < 8; i++) {
       let emptyCount = 0;
@@ -309,27 +232,56 @@ export class ChessBoard {
 
   public move(start: BoardPosition, end: BoardPosition): false | Chessboard {
     const piece = this.getPiece(start);
+    let moveType = "";
     if (!piece) return false;
     if (piece.getColor() !== this.turn) return false;
-    if (!piece.canMove(end)) return false;
-    if (!this.testMoveForCheck(piece, end)) return false;
-    this.makeMove(start, end);
-
-    if (this.isCheck(this.turn)) {
-      this.check = true;
-      if (this.isCheckmate(this.turn)) {
-        this.checkmate = true;
-        this.winner = this.turn === PieceColor.White ? "black" : "white";
-      }
+    if (piece.canMoveTo(end)) {
+      moveType = "move";
+    } else if (piece.canAttackTo(end)) {
+      moveType = "attack";
     } else {
-      this.check = false;
+      return false;
     }
-    // this.printBoard();
+
+    //TODO test for check
+
+    if (moveType === "move") {
+      piece.move(end);
+    } else if (moveType === "attack") {
+      piece.attack(end);
+    }
+    //   const piece = this.getPiece(start);
+    //   if (!piece) return false;
+    //   if (piece.getColor() !== this.turn) return false;
+    //   if (!piece.canMove(end)) return false;
+    //   if (!this.testMoveForCheck(piece, end)) return false;
+    //   this.makeMove(start, end);
+    //
+    //   if (this.isCheck(this.turn)) {
+    //     this.check = true;
+    //     if (this.isCheckmate(this.turn)) {
+    //       this.checkmate = true;
+    //       this.winner = this.turn === PieceColor.White ? "black" : "white";
+    //     }
+    //   } else {
+    //     this.check = false;
+    //   }
+    this.alivePieces.forEach((piece) => {
+      piece.generateMoves();
+    });
+
+    this.FEN = this.getFEN();
     return this.board.map((row: (Chesspiece | null)[]) =>
       row.slice(),
     ) as Chessboard;
   }
 
+  public movePiece(piece: Chesspiece, end: BoardPosition): void {
+    const start = piece.getPosition();
+    this.setPieceAt(end, piece);
+    this.setPieceAt(start, null);
+    this.updateState();
+  }
   public makeMove(start: BoardPosition, end: BoardPosition): void {
     let piece = this.getPiece(start);
     const deadPiece = this.getPiece(end);
@@ -433,8 +385,13 @@ export class ChessBoard {
     return this.board[position.y][position.x] !== null;
   }
 
-  public getPiece(position: ChessPosition): Chesspiece | null {
-    return this.board[position.y][position.x];
+  public getPiece(position: ChessPosition): Chesspiece | null | undefined {
+    try {
+      return this.board[position.y][position.x];
+    } catch (e) {
+      console.log(position);
+      return undefined;
+    }
   }
 
   public getKing(color: PieceColor): King {
@@ -445,6 +402,14 @@ export class ChessBoard {
     }
   }
 
+  public killPiece(location: BoardPosition): void {
+    const piece = this.getPiece(location);
+    if (piece) {
+      this.board[location.y][location.x] = null;
+      this.deadPieces.push(piece);
+      this.alivePieces = this.alivePieces.filter((p) => p !== piece);
+    }
+  }
   public getPieces(color: PieceColor): Chesspiece[] {
     return this.alivePieces.filter((p) => p?.getColor() === color);
   }
@@ -481,5 +446,19 @@ export class ChessBoard {
   public changeTurn(): void {
     this.turn =
       this.turn === PieceColor.White ? PieceColor.Black : PieceColor.White;
+  }
+  public updateState(): void {
+    this.halfMoves += 1;
+    if (this.turn === PieceColor.Black) {
+      this.fullMoves += 1;
+    }
+    this.changeTurn();
+    this.enPassant = "-";
+
+    //   this.check = this.isCheck();
+    //   this.checkmate = this.isCheckmate();
+    //   if (this.checkmate) {
+    //     this.winner = this.turn === PieceColor.White ? "black" : "white";
+    //   }
   }
 }
