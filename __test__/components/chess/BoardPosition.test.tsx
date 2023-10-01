@@ -11,4 +11,7 @@ test("BoardPosition", () => {
   expect(bPosition.add(1, 0).toChessNotation()).toBe("e4");
   expect(bPosition.add(-1, 0).toChessNotation()).toBe("c4");
   expect(bPosition.add(0, -1).toChessNotation()).toBe("d3");
+  expect(new BoardPosition(1, 1).isOnBoard()).toBe(true);
+  expect(new BoardPosition(8, 8).isOnBoard()).toBe(false);
+  expect(new BoardPosition(-1, -1).isOnBoard()).toBe(false);
 });
