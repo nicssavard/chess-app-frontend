@@ -7,7 +7,7 @@ import {
 } from "@dnd-kit/core";
 import Board from "./Board";
 import BoardPosition from "@/components/chess/BoardPosition";
-import { ChessBoard } from "@/components/chess/ChessBoard";
+import ChessBoard from "@/components/chess/ChessBoard";
 import { ChessPosition, Chessboard } from "../../../../../typings";
 import _, { set } from "lodash";
 
@@ -66,7 +66,8 @@ export default function Game() {
     if (!piece) return;
     const moves = piece.getMoves();
     const attacks = piece.getAttacks();
-
+    console.log(moves);
+    console.log(attacks);
     if (!moves || !attacks) return;
     const newPossibleMoves = possibleMoves.map((row) => [...row]);
     moves.forEach((move: BoardPosition) => {

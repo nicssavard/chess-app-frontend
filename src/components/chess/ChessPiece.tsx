@@ -1,4 +1,4 @@
-import { ChessBoard } from "./ChessBoard";
+import ChessBoard from "./ChessBoard";
 import BoardPosition from "./BoardPosition";
 import { PieceColor } from "./ChessBoard";
 
@@ -148,15 +148,34 @@ export class Chesspiece {
     this.possibleAttacks = [];
   }
   public move(end: BoardPosition) {
-    const start = this.getPosition();
+    console.log("move");
     this.getBoard().movePiece(this, end);
     return;
   }
   public attack(end: BoardPosition) {
+    console.log("attack");
     this.getBoard().killPiece(end);
     this.getBoard().movePiece(this, end);
     this.getBoard().halfMoves = 0;
     return;
+  }
+  public isInMoves(end: BoardPosition) {
+    let found = false;
+    this.possibleMoves.forEach((position) => {
+      if (position.equals(end)) {
+        found = true;
+      }
+    });
+    return found;
+  }
+  public isInAttacks(end: BoardPosition) {
+    let found = false;
+    this.possibleAttacks.forEach((position) => {
+      if (position.equals(end)) {
+        found = true;
+      }
+    });
+    return found;
   }
 }
 

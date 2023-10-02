@@ -1,4 +1,4 @@
-import { ChessBoard } from "@/components/chess/ChessBoard";
+import ChessBoard from "@/components/chess/ChessBoard";
 import { Pawn } from "@/components/chess/ChessPiece";
 import BoardPosition from "@/components/chess/BoardPosition";
 

@@ -8,7 +8,7 @@ export enum PieceColor {
   Black = "b",
 }
 
-export class ChessBoard {
+export default class ChessBoard {
   board: Chessboard = []; //has to be checked with y,x  board[y][x]
   turn: PieceColor = PieceColor.White;
   halfMoves: number = 0;
@@ -239,9 +239,9 @@ export class ChessBoard {
     let moveType = "";
     if (!piece) return false;
     if (piece.getColor() !== this.turn) return false;
-    if (piece.canMoveTo(end)) {
+    if (piece.isInMoves(end)) {
       moveType = "move";
-    } else if (piece.canAttackTo(end)) {
+    } else if (piece.isInAttacks(end)) {
       moveType = "attack";
     } else {
       return false;

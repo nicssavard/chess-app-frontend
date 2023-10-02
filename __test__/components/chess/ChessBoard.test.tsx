@@ -1,5 +1,5 @@
 import BoardPosition from "@/components/chess/BoardPosition";
-import { ChessBoard } from "@/components/chess/ChessBoard";
+import ChessBoard from "@/components/chess/ChessBoard";
 
 describe("ChessBoard", () => {
   test("chessboard square are identified properly", () => {
