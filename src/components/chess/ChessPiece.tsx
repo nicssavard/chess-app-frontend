@@ -31,14 +31,14 @@ export class Chesspiece {
     };
   }
 
-  public move(end: BoardPosition) {
-    console.log("move");
-    return;
-  }
-  public attack(end: BoardPosition) {
-    console.log("attack");
-    return;
-  }
+  // public move(end: BoardPosition) {
+  //   console.log("move");
+  //   return;
+  // }
+  // public attack(end: BoardPosition) {
+  //   console.log("attack");
+  //   return;
+  // }
   // public canMove(end: BoardPosition): boolean {
   //   if (!this.basicMoveChecks(end)) return false;
   //   return this.canMoveTo(end);
@@ -132,12 +132,31 @@ export class Chesspiece {
     return this.possibleAttacks.some((attack) => attack.equals(end));
   }
   public getMoves() {
-    this.generateMoves();
     return this.possibleMoves;
   }
   public getAttacks() {
-    this.generateMoves();
     return this.possibleAttacks;
+  }
+  public addMove(move: BoardPosition) {
+    this.possibleMoves.push(move);
+  }
+  public addAttack(attack: BoardPosition) {
+    this.possibleAttacks.push(attack);
+  }
+  public clearMoves() {
+    this.possibleMoves = [];
+    this.possibleAttacks = [];
+  }
+  public move(end: BoardPosition) {
+    const start = this.getPosition();
+    this.getBoard().movePiece(this, end);
+    return;
+  }
+  public attack(end: BoardPosition) {
+    this.getBoard().killPiece(end);
+    this.getBoard().movePiece(this, end);
+    this.getBoard().halfMoves = 0;
+    return;
   }
 }
 
@@ -148,7 +167,7 @@ export class Pawn extends Chesspiece {
 
   public move(end: BoardPosition) {
     const start = this.getPosition();
-    this.getBoard().movePiece(this, end);
+    super.move(end);
     this.getBoard().halfMoves = 0;
     if (Math.abs(start.y - end.y) === 2) {
       if (this.getColor() === PieceColor.White) {
@@ -160,23 +179,19 @@ export class Pawn extends Chesspiece {
     return;
   }
   public attack(end: BoardPosition) {
-    const start = this.getPosition();
     if (this.getBoard().enPassant === end.toChessNotation()) {
       this.getBoard().killPiece(
         end.add(0, this.getColor() === PieceColor.White ? -1 : 1),
       );
+      this.getBoard().movePiece(this, end);
+      this.getBoard().halfMoves = 0;
+      return;
     } else {
-      this.getBoard().killPiece(end);
+      super.attack(end);
+      return;
     }
-    this.getBoard().movePiece(this, end);
-    this.getBoard().halfMoves = 0;
-    return;
   }
 
-  public clearMoves() {
-    this.possibleMoves = [];
-    this.possibleAttacks = [];
-  }
   public generateMoves() {
     this.clearMoves();
     const p = this.getPosition();
@@ -185,12 +200,6 @@ export class Pawn extends Chesspiece {
     this.canMoveTo(p.add(0, dir * 2));
     this.canAttack(p.add(1, dir));
     this.canAttack(p.add(-1, dir));
-  }
-  public addMove(move: BoardPosition) {
-    this.possibleMoves.push(move);
-  }
-  public addAttack(attack: BoardPosition) {
-    this.possibleAttacks.push(attack);
   }
 
   public canMoveTo(end: BoardPosition): boolean {
@@ -282,13 +291,37 @@ export class Knight extends Chesspiece {
   constructor(color: PieceColor, position: BoardPosition, board: ChessBoard) {
     super(color, position, board, "Knight");
   }
-  protected canMoveTo(end: BoardPosition): boolean {
-    return (
-      (Math.abs(this.getPosition().x - end.x) === 1 &&
-        Math.abs(this.getPosition().y - end.y) === 2) ||
-      (Math.abs(this.getPosition().x - end.x) === 2 &&
-        Math.abs(this.getPosition().y - end.y) === 1)
-    );
+  public generateMoves() {
+    this.clearMoves();
+    const p = this.getPosition();
+    this.canMoveTo(p.add(1, 2));
+    this.canMoveTo(p.add(2, 1));
+    this.canMoveTo(p.add(2, -1));
+    this.canMoveTo(p.add(1, -2));
+    this.canMoveTo(p.add(-1, -2));
+    this.canMoveTo(p.add(-2, -1));
+    this.canMoveTo(p.add(-2, 1));
+    this.canMoveTo(p.add(-1, 2));
+  }
+  public canMoveTo(end: BoardPosition): boolean {
+    if (!end.isOnBoard()) return false;
+    if (this.getBoard().getPiece(end)) {
+      if (this.getColor() != this.getBoard().getPiece(end)?.getColor()) {
+        this.addAttack(end);
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      this.addMove(end);
+      return true;
+    }
+    // return (
+    //   (Math.abs(this.getPosition().x - end.x) === 1 &&
+    //     Math.abs(this.getPosition().y - end.y) === 2) ||
+    //   (Math.abs(this.getPosition().x - end.x) === 2 &&
+    //     Math.abs(this.getPosition().y - end.y) === 1)
+    // );
   }
 }
 

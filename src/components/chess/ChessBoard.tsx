@@ -107,6 +107,10 @@ export class ChessBoard {
     this.enPassant = fen.split(" ")[3];
     this.halfMoves = Number(fen.split(" ")[4]);
     this.fullMoves = Number(fen.split(" ")[5]);
+
+    this.alivePieces.forEach((piece) => {
+      piece.generateMoves();
+    });
   }
 
   public createPieceFromFENLetter(
