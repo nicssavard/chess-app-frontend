@@ -261,25 +261,21 @@ export class Rook extends Chesspiece {
       { x: -1, y: 0 },
     ];
     directions.forEach((dir) => {
-      let valid = true;
       let d = 1;
-      while (valid) {
+      while (true) {
         const pos = this.getPosition().add(d * dir.x, d * dir.y);
         const endSquare = this.getBoard().getPiece(pos);
         if (endSquare === null) {
-          console.log("add move");
+          //can move there
           this.addMove(pos);
         } else if (endSquare === undefined) {
-          console.log("leave");
-          valid = false;
+          //outside of the board
           break;
         } else {
           //there is a piece on the endSquare
           if (this.getColor() != endSquare.getColor()) {
-            console.log("add attack");
             this.addAttack(pos);
           }
-          valid = false;
           break;
         }
         d += 1;
@@ -334,7 +330,7 @@ export class Bishop extends Chesspiece {
   constructor(color: PieceColor, position: BoardPosition, board: ChessBoard) {
     super(color, position, board, "Bishop");
   }
-  protected canMoveTo(end: BoardPosition): boolean {
+  canMoveTo(end: BoardPosition): boolean {
     return (
       this.isDiagonal(this.getPosition(), end) &&
       this.diagonalClear(this.getPosition(), end)
@@ -346,7 +342,7 @@ export class Queen extends Chesspiece {
   constructor(color: PieceColor, position: BoardPosition, board: ChessBoard) {
     super(color, position, board, "Queen");
   }
-  protected canMoveTo(end: BoardPosition): boolean {
+  canMoveTo(end: BoardPosition): boolean {
     if (this.isLinear(this.getPosition(), end)) {
       return this.lineClear(this.getPosition(), end);
     } else if (this.isDiagonal(this.getPosition(), end)) {
@@ -361,7 +357,7 @@ export class King extends Chesspiece {
   constructor(color: PieceColor, position: BoardPosition, board: ChessBoard) {
     super(color, position, board, "King");
   }
-  protected canMoveTo(end: BoardPosition): boolean {
+  canMoveTo(end: BoardPosition): boolean {
     return (
       Math.abs(this.getPosition().x - end.x) <= 1 &&
       Math.abs(this.getPosition().y - end.y) <= 1

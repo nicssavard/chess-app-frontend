@@ -40,10 +40,6 @@ export default class ChessBoard {
   // bPawn6: Pawn = new Pawn(PieceColor.Black, { x: 5, y: 6 }, this);
   // bPawn7: Pawn = new Pawn(PieceColor.Black, { x: 6, y: 6 }, this);
   // bPawn8: Pawn = new Pawn(PieceColor.Black, { x: 7, y: 6 }, this);
-  wRook1: Rook = new Rook(PieceColor.White, new BoardPosition(0, 0), this);
-  wRook2: Rook = new Rook(PieceColor.White, new BoardPosition(7, 0), this);
-  bRook1: Rook = new Rook(PieceColor.Black, new BoardPosition(0, 7), this);
-  bRook2: Rook = new Rook(PieceColor.Black, new BoardPosition(7, 7), this);
   // wKnight1: Knight = new Knight(PieceColor.White, { x: 1, y: 0 }, this);
   // wKnight2: Knight = new Knight(PieceColor.White, { x: 6, y: 0 }, this);
   // bKnight1: Knight = new Knight(PieceColor.Black, { x: 1, y: 7 }, this);
@@ -190,19 +186,37 @@ export default class ChessBoard {
     fen = fen.split("/").reverse().join("/");
     fen += ` ${this.turn === PieceColor.White ? "w" : "b"} `;
     let castle = "";
+    const wRook1 = this.getPiece(new BoardPosition(0, 0));
+    const wRook2 = this.getPiece(new BoardPosition(7, 0));
+    const bRook1 = this.getPiece(new BoardPosition(0, 7));
+    const bRook2 = this.getPiece(new BoardPosition(7, 7));
+    //TODO KING IS NOT TRACKED
     if (!this.wKing.hasMoved) {
-      if (!this.wRook2.hasMoved) {
+      // NOT perfect logic, doesn't account for rook moving and then moving back
+      if (
+        wRook2?.getType() === "Rook" &&
+        wRook2?.getPosition().equals(new BoardPosition(7, 0))
+      ) {
         castle += "K";
       }
-      if (!this.wRook1.hasMoved) {
+      if (
+        wRook1?.getType() === "Rook" &&
+        wRook1?.getPosition().equals(new BoardPosition(0, 0))
+      ) {
         castle += "Q";
       }
     }
     if (!this.bKing.hasMoved) {
-      if (!this.bRook2.hasMoved) {
+      if (
+        bRook2?.getType() === "Rook" &&
+        bRook2?.getPosition().equals(new BoardPosition(7, 7))
+      ) {
         castle += "k";
       }
-      if (!this.bRook1.hasMoved) {
+      if (
+        bRook1?.getType() === "Rook" &&
+        bRook1?.getPosition().equals(new BoardPosition(0, 7))
+      ) {
         castle += "q";
       }
     }
@@ -393,7 +407,6 @@ export default class ChessBoard {
     try {
       return this.board[position.y][position.x];
     } catch (e) {
-      console.log(position);
       return undefined;
     }
   }
