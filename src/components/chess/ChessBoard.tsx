@@ -104,6 +104,17 @@ export default class ChessBoard {
     this.halfMoves = Number(fen.split(" ")[4]);
     this.fullMoves = Number(fen.split(" ")[5]);
 
+    const kings = this.alivePieces.filter(
+      (piece) => piece.getType() === "King",
+    );
+    kings.forEach((king) => {
+      if (king.getColor() === "w") {
+        this.wKing = king as King;
+      } else {
+        this.bKing = king as King;
+      }
+    });
+
     this.alivePieces.forEach((piece) => {
       piece.generateMoves();
     });

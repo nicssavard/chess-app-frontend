@@ -33,6 +33,30 @@ export class Chesspiece {
 
   public generateMoves() { }
 
+  public generateMovesLine(directions: BoardPosition[], length: number = 8) {
+    this.clearMoves();
+    directions.forEach((dir) => {
+      let d = 1;
+      while (d <= length) {
+        const pos = this.getPosition().add(d * dir.x, d * dir.y);
+        const endSquare = this.getBoard().getPiece(pos);
+        if (endSquare === null) {
+          //can move there
+          this.addMove(pos);
+        } else if (endSquare === undefined) {
+          //outside of the board
+          break;
+        } else {
+          //there is a piece on the endSquare
+          if (this.getColor() != endSquare.getColor()) {
+            this.addAttack(pos);
+          }
+          break;
+        }
+        d += 1;
+      }
+    });
+  }
   protected basicMoveChecks(end: BoardPosition): boolean {
     if (this.position.x === end.x && this.position.y === end.y) return false;
     const target = this.board.getPiece(end);
@@ -252,45 +276,22 @@ export class Rook extends Chesspiece {
     super(color, position, board, "Rook");
   }
 
-  public generateMoves() {
-    this.clearMoves();
-    const directions = [
-      { x: 0, y: 1 },
-      { x: 0, y: -1 },
-      { x: 1, y: 0 },
-      { x: -1, y: 0 },
-    ];
-    directions.forEach((dir) => {
-      let d = 1;
-      while (true) {
-        const pos = this.getPosition().add(d * dir.x, d * dir.y);
-        const endSquare = this.getBoard().getPiece(pos);
-        if (endSquare === null) {
-          //can move there
-          this.addMove(pos);
-        } else if (endSquare === undefined) {
-          //outside of the board
-          break;
-        } else {
-          //there is a piece on the endSquare
-          if (this.getColor() != endSquare.getColor()) {
-            this.addAttack(pos);
-          }
-          break;
-        }
-        d += 1;
-      }
-    });
-  }
-  public canMoveTo(end: BoardPosition): boolean {
-    return (
-      this.isLinear(this.getPosition(), end) &&
-      this.lineClear(this.getPosition(), end)
-    );
-  }
-
-  protected setHasMoved() {
+  public move(end: BoardPosition): void {
     this.hasMoved = true;
+    super.move(end);
+  }
+  public attack(end: BoardPosition): void {
+    this.hasMoved = true;
+    super.attack(end);
+  }
+  public generateMoves() {
+    const directions = [
+      new BoardPosition(0, 1),
+      new BoardPosition(0, -1),
+      new BoardPosition(1, 0),
+      new BoardPosition(-1, 0),
+    ];
+    this.generateMovesLine(directions);
   }
 }
 
@@ -330,11 +331,14 @@ export class Bishop extends Chesspiece {
   constructor(color: PieceColor, position: BoardPosition, board: ChessBoard) {
     super(color, position, board, "Bishop");
   }
-  canMoveTo(end: BoardPosition): boolean {
-    return (
-      this.isDiagonal(this.getPosition(), end) &&
-      this.diagonalClear(this.getPosition(), end)
-    );
+  public generateMoves() {
+    const directions = [
+      new BoardPosition(1, 1),
+      new BoardPosition(1, -1),
+      new BoardPosition(-1, 1),
+      new BoardPosition(-1, -1),
+    ];
+    this.generateMovesLine(directions);
   }
 }
 
@@ -342,13 +346,18 @@ export class Queen extends Chesspiece {
   constructor(color: PieceColor, position: BoardPosition, board: ChessBoard) {
     super(color, position, board, "Queen");
   }
-  canMoveTo(end: BoardPosition): boolean {
-    if (this.isLinear(this.getPosition(), end)) {
-      return this.lineClear(this.getPosition(), end);
-    } else if (this.isDiagonal(this.getPosition(), end)) {
-      return this.diagonalClear(this.getPosition(), end);
-    }
-    return false;
+  public generateMoves() {
+    const directions = [
+      new BoardPosition(0, 1),
+      new BoardPosition(0, -1),
+      new BoardPosition(1, 0),
+      new BoardPosition(-1, 0),
+      new BoardPosition(1, 1),
+      new BoardPosition(1, -1),
+      new BoardPosition(-1, 1),
+      new BoardPosition(-1, -1),
+    ];
+    this.generateMovesLine(directions);
   }
 }
 
@@ -356,6 +365,27 @@ export class King extends Chesspiece {
   hasMoved: boolean = false;
   constructor(color: PieceColor, position: BoardPosition, board: ChessBoard) {
     super(color, position, board, "King");
+  }
+  public move(end: BoardPosition): void {
+    this.hasMoved = true;
+    super.move(end);
+  }
+  public attack(end: BoardPosition): void {
+    this.hasMoved = true;
+    super.attack(end);
+  }
+  public generateMoves() {
+    const directions = [
+      new BoardPosition(0, 1),
+      new BoardPosition(0, -1),
+      new BoardPosition(1, 0),
+      new BoardPosition(-1, 0),
+      new BoardPosition(1, 1),
+      new BoardPosition(1, -1),
+      new BoardPosition(-1, 1),
+      new BoardPosition(-1, -1),
+    ];
+    this.generateMovesLine(directions, 1);
   }
   canMoveTo(end: BoardPosition): boolean {
     return (

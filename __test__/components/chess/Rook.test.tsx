@@ -1,9 +1,9 @@
 import ChessBoard from "@/components/chess/ChessBoard";
-import { Rook } from "@/components/chess/ChessPiece";
 import BoardPosition from "@/components/chess/BoardPosition";
 
 describe("Rook", () => {
   test("Rook moves and attack", () => {
+    //rook attacks third black pawn
     const chessBoard = new ChessBoard();
 
     chessBoard.move(new BoardPosition(0, 1), new BoardPosition(0, 3));
