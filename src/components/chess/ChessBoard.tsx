@@ -21,35 +21,9 @@ export default class ChessBoard {
   alivePieces: Chesspiece[] = [];
   deadPieces: Chesspiece[] = [];
   moveHistory: string[] = []; //FEN notation
-  possibleMoves: ChessPosition[] = [];
-  possibleAttacks: ChessPosition[] = [];
+  possibleMoves: BoardPosition[] = [];
+  possibleAttacks: BoardPosition[] = [];
   FEN: string = "";
-  // wPawn1: Pawn = new Pawn(PieceColor.White, { x: 0, y: 1 }, this);
-  // wPawn2: Pawn = new Pawn(PieceColor.White, { x: 1, y: 1 }, this);
-  // wPawn3: Pawn = new Pawn(PieceColor.White, { x: 2, y: 1 }, this);
-  // wPawn4: Pawn = new Pawn(PieceColor.White, { x: 3, y: 1 }, this);
-  // wPawn5: Pawn = new Pawn(PieceColor.White, { x: 4, y: 1 }, this);
-  // wPawn6: Pawn = new Pawn(PieceColor.White, { x: 5, y: 1 }, this);
-  // wPawn7: Pawn = new Pawn(PieceColor.White, { x: 6, y: 1 }, this);
-  // wPawn8: Pawn = new Pawn(PieceColor.White, { x: 7, y: 1 }, this);
-  // bPawn1: Pawn = new Pawn(PieceColor.Black, { x: 0, y: 6 }, this);
-  // bPawn2: Pawn = new Pawn(PieceColor.Black, { x: 1, y: 6 }, this);
-  // bPawn3: Pawn = new Pawn(PieceColor.Black, { x: 2, y: 6 }, this);
-  // bPawn4: Pawn = new Pawn(PieceColor.Black, { x: 3, y: 6 }, this);
-  // bPawn5: Pawn = new Pawn(PieceColor.Black, { x: 4, y: 6 }, this);
-  // bPawn6: Pawn = new Pawn(PieceColor.Black, { x: 5, y: 6 }, this);
-  // bPawn7: Pawn = new Pawn(PieceColor.Black, { x: 6, y: 6 }, this);
-  // bPawn8: Pawn = new Pawn(PieceColor.Black, { x: 7, y: 6 }, this);
-  // wKnight1: Knight = new Knight(PieceColor.White, { x: 1, y: 0 }, this);
-  // wKnight2: Knight = new Knight(PieceColor.White, { x: 6, y: 0 }, this);
-  // bKnight1: Knight = new Knight(PieceColor.Black, { x: 1, y: 7 }, this);
-  // bKnight2: Knight = new Knight(PieceColor.Black, { x: 6, y: 7 }, this);
-  // wBishop1: Bishop = new Bishop(PieceColor.White, { x: 2, y: 0 }, this);
-  // wBishop2: Bishop = new Bishop(PieceColor.White, { x: 5, y: 0 }, this);
-  // bBishop1: Bishop = new Bishop(PieceColor.Black, { x: 2, y: 7 }, this);
-  // bBishop2: Bishop = new Bishop(PieceColor.Black, { x: 5, y: 7 }, this);
-  // wQueen: Queen = new Queen(PieceColor.White, { x: 3, y: 0 }, this);
-  // bQueen: Queen = new Queen(PieceColor.Black, { x: 3, y: 7 }, this);
   wKing: King = new King(PieceColor.White, new BoardPosition(4, 0), this);
   bKing: King = new King(PieceColor.Black, new BoardPosition(4, 7), this);
 
@@ -201,7 +175,6 @@ export default class ChessBoard {
     const wRook2 = this.getPiece(new BoardPosition(7, 0));
     const bRook1 = this.getPiece(new BoardPosition(0, 7));
     const bRook2 = this.getPiece(new BoardPosition(7, 7));
-    //TODO KING IS NOT TRACKED
     if (!this.wKing.hasMoved) {
       // NOT perfect logic, doesn't account for rook moving and then moving back
       if (
@@ -274,6 +247,8 @@ export default class ChessBoard {
 
     //TODO test for check
 
+    if (!this.testMoveForCheck(start, end, moveType)) return false;
+
     if (moveType === "move") {
       piece.move(end);
     } else if (moveType === "attack") {
@@ -295,9 +270,8 @@ export default class ChessBoard {
     //   } else {
     //     this.check = false;
     //   }
-    this.alivePieces.forEach((piece) => {
-      piece.generateMoves();
-    });
+    this.generatePossibleMovesAndAttacks();
+    this.check = this.isCheck(this.turn);
 
     this.FEN = this.getFEN();
     return this.board.map((row: (Chesspiece | null)[]) =>
@@ -347,30 +321,37 @@ export default class ChessBoard {
     return `${letters[position.x]}${position.y + 1}`;
   }
 
-  testMoveForCheck(piece: Chesspiece, end: BoardPosition): boolean {
-    piece = _.cloneDeep(piece);
+  public generatePossibleMovesAndAttacks(): void {
+    this.possibleMoves = [];
+    this.possibleAttacks = [];
+    this.alivePieces.forEach((piece) => {
+      piece.generateMoves();
+      this.possibleMoves.push(...piece.getMoves());
+      this.possibleAttacks.push(...piece.getAttacks());
+    });
+  }
+  testMoveForCheck(
+    start: BoardPosition,
+    end: BoardPosition,
+    moveType: string,
+  ): boolean {
     const chessBoardCopy = _.cloneDeep(this);
-    const attackedPiece = chessBoardCopy.board[end.y]![end.x];
-    if (piece?.getColor() !== this.turn) return false;
-    if (attackedPiece && attackedPiece.getType() === "King") return false;
+    const piece = chessBoardCopy.getPiece(start) as Chesspiece;
+    if (moveType === "move") {
+      piece.move(end);
+    } else if (moveType === "attack") {
+      piece.attack(end);
+    }
 
-    chessBoardCopy.makeMove(piece.getPosition(), end);
+    chessBoardCopy.generatePossibleMovesAndAttacks();
     if (chessBoardCopy.isCheck(this.turn)) return false;
-
     return true;
   }
   isCheck(color: PieceColor = PieceColor.White): boolean {
     const king = this.getKing(color);
-    let isCheck = false;
-    const pieces = this.getPieces(
-      color === PieceColor.White ? PieceColor.Black : PieceColor.White,
-    );
-    pieces.forEach((p) => {
-      if (p?.canMove(king!.getPosition())) {
-        isCheck = true;
-      }
+    return this.possibleAttacks.some((attack) => {
+      return attack.equals(king.getPosition());
     });
-    return isCheck;
   }
 
   isCheckmate(color: PieceColor = PieceColor.White): boolean {
@@ -399,6 +380,10 @@ export default class ChessBoard {
 
     return true; // No legal moves removed the check, so it's checkmate
   }
+
+  getCheck = (): boolean => {
+    return this.check;
+  };
 
   pawnPromotion(piece: Chesspiece, end: ChessPosition): boolean {
     if (

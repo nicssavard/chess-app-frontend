@@ -77,13 +77,30 @@ describe("ChessBoard", () => {
     );
     expect(chessBoard.getAlivePieces().length).toBe(31);
     expect(chessBoard.getDeadPieces().length).toBe(1);
-
-    // chessBoard.move(new BoardPosition(3, 3), new BoardPosition(2, 1));
-    // chessBoard.move(new BoardPosition(3, 0), new BoardPosition(2, 1));
-    // expect(chessBoard.getFEN()).toBe(
-    //   "r1bqkbnr/pp1ppppp/8/2p5/2P1P3/8/PPQP1PPP/RNB1KB1R b KQkq - 0 5",
-    // );
-    // expect(chessBoard.getAlivePieces().length).toBe(30);
-    // expect(chessBoard.getDeadPieces().length).toBe(2);
+  });
+  test("test Check", () => {
+    const chessBoard = new ChessBoard();
+    chessBoard.move(new BoardPosition(4, 1), new BoardPosition(4, 3));
+    chessBoard.move(new BoardPosition(5, 6), new BoardPosition(5, 4));
+    chessBoard.move(new BoardPosition(3, 0), new BoardPosition(7, 4));
+    expect(chessBoard.getCheck()).toBe(true);
+  });
+  test("test Checkmate", () => {
+    const chessBoard = new ChessBoard();
+    chessBoard.move(new BoardPosition(4, 1), new BoardPosition(4, 3));
+    chessBoard.move(new BoardPosition(4, 6), new BoardPosition(4, 4));
+    chessBoard.move(new BoardPosition(3, 0), new BoardPosition(7, 4));
+    chessBoard.move(new BoardPosition(4, 7), new BoardPosition(4, 6));
+    chessBoard.move(new BoardPosition(7, 4), new BoardPosition(4, 4));
+    expect(chessBoard.checkmate).toBe(true);
+  });
+  test("testMoveForCheck", () => {
+    const chessBoard = new ChessBoard();
+    chessBoard.move(new BoardPosition(4, 1), new BoardPosition(4, 3));
+    chessBoard.move(new BoardPosition(4, 6), new BoardPosition(4, 4));
+    chessBoard.move(new BoardPosition(3, 0), new BoardPosition(7, 4));
+    expect(
+      chessBoard.move(new BoardPosition(5, 6), new BoardPosition(5, 5)),
+    ).toBe(false);
   });
 });

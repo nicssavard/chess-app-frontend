@@ -57,7 +57,6 @@ export default function Game() {
       setWin(chessBoard.winner);
     }
     setIsCheckMate(chessBoard.checkmate);
-    console.log(chessBoard);
   };
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -66,8 +65,6 @@ export default function Game() {
     if (!piece) return;
     const moves = piece.getMoves();
     const attacks = piece.getAttacks();
-    console.log(moves);
-    console.log(attacks);
     if (!moves || !attacks) return;
     const newPossibleMoves = possibleMoves.map((row) => [...row]);
     moves.forEach((move: BoardPosition) => {
