@@ -31,7 +31,7 @@ describe("ChessBoard", () => {
     expect(chessBoard.getPiece({ x: 5, y: 7 })?.getType()).toBe("Bishop");
     expect(chessBoard.getPiece({ x: 6, y: 7 })?.getType()).toBe("Knight");
     expect(chessBoard.getPiece({ x: 7, y: 7 })?.getType()).toBe("Rook");
-    expect(chessBoard.getAlivePieces().length).toBe(32);
+    expect(chessBoard.alivePieces.length).toBe(32);
   });
   test("FEN string test", () => {
     const chessBoard = new ChessBoard();
@@ -75,8 +75,8 @@ describe("ChessBoard", () => {
     expect(chessBoard.wKing.getPosition()).toStrictEqual(
       new BoardPosition(4, 0),
     );
-    expect(chessBoard.getAlivePieces().length).toBe(31);
-    expect(chessBoard.getDeadPieces().length).toBe(1);
+    expect(chessBoard.alivePieces.length).toBe(31);
+    expect(chessBoard.deadPieces.length).toBe(1);
   });
   test("test Check", () => {
     const chessBoard = new ChessBoard();

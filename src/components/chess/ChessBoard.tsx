@@ -94,6 +94,243 @@ export default class ChessBoard {
     });
   }
 
+  public move(start: BoardPosition, end: BoardPosition): false | Chessboard {
+    const piece = this.getPiece(start);
+    let moveType = "";
+    if (!piece) return false;
+    if (piece.getColor() !== this.turn) return false;
+    if (piece.isInMoves(end)) {
+      moveType = "move";
+    } else if (piece.isInAttacks(end)) {
+      moveType = "attack";
+    } else {
+      return false;
+    }
+
+    //TODO test for check
+
+    if (!this.testMoveForCheck(start, end, moveType)) return false;
+
+    if (moveType === "move") {
+      piece.move(end);
+    } else if (moveType === "attack") {
+      piece.attack(end);
+    }
+    //   const piece = this.getPiece(start);
+    //   if (!piece) return false;
+    //   if (piece.getColor() !== this.turn) return false;
+    //   if (!piece.canMove(end)) return false;
+    //   if (!this.testMoveForCheck(piece, end)) return false;
+    //   this.makeMove(start, end);
+    //
+    //   if (this.isCheck(this.turn)) {
+    //     this.check = true;
+    //     if (this.isCheckmate(this.turn)) {
+    //       this.checkmate = true;
+    //       this.winner = this.turn === PieceColor.White ? "black" : "white";
+    //     }
+    //   } else {
+    //     this.check = false;
+    //   }
+    this.generatePossibleMovesAndAttacks();
+    this.check = this.isCheck(this.turn);
+
+    if (this.check) {
+      if (this.isCheckmate(this.turn)) {
+        this.checkmate = true;
+        this.winner = this.turn === PieceColor.White ? "black" : "white";
+      }
+    }
+
+    this.FEN = this.getFEN();
+    return this.board.map((row: (Chesspiece | null)[]) =>
+      row.slice(),
+    ) as Chessboard;
+  }
+
+  public movePiece(piece: Chesspiece, end: BoardPosition): void {
+    const start = piece.getPosition();
+    this.setPieceAt(end, piece);
+    this.setPieceAt(start, null);
+    this.updateState();
+  }
+
+  getSquareCode(position: ChessPosition): string {
+    const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
+    return `${letters[position.x]}${position.y + 1}`;
+  }
+
+  public generatePossibleMovesAndAttacks(): void {
+    this.possibleMoves = [];
+    this.possibleAttacks = [];
+    this.alivePieces.forEach((piece) => {
+      piece.generateMoves();
+      this.possibleMoves.push(...piece.getMoves());
+      this.possibleAttacks.push(...piece.getAttacks());
+    });
+  }
+  testMoveForCheck(
+    start: BoardPosition,
+    end: BoardPosition,
+    moveType: string,
+  ): boolean {
+    const chessBoardCopy = _.cloneDeep(this);
+    const piece = chessBoardCopy.getPiece(start) as Chesspiece;
+    if (moveType === "move") {
+      piece.move(end);
+    } else if (moveType === "attack") {
+      piece.attack(end);
+    }
+
+    chessBoardCopy.generatePossibleMovesAndAttacks();
+    if (chessBoardCopy.isCheck(this.turn)) return false;
+    return true;
+  }
+  isCheck(color: PieceColor = PieceColor.White): boolean {
+    const king = this.getKing(color);
+    return this.possibleAttacks.some((attack) => {
+      return attack.equals(king.getPosition());
+    });
+  }
+  isCheckmate(color: PieceColor = PieceColor.White): boolean {
+    let isCheckmate = true;
+
+    this.getAlivePieces(color).some((piece) => {
+      return (
+        piece.getMoves().some((move) => {
+          if (this.testMoveForCheck(piece.getPosition(), move, "move")) {
+            isCheckmate = false;
+            return true; // exits the loop early
+          }
+          return false; // continue checking
+        }) ||
+        piece.getAttacks().some((attack) => {
+          if (this.testMoveForCheck(piece.getPosition(), attack, "attack")) {
+            isCheckmate = false;
+            return true; // exits the loop early
+          }
+          return false; // continue checking
+        })
+      );
+    });
+
+    return isCheckmate;
+  }
+  // isCheckmate(color: PieceColor = PieceColor.White): boolean {
+  //   let isCheckmate = true;
+  //   this.getAlivePieces(color).forEach((piece) => {
+  //     piece.getMoves().forEach((move) => {
+  //       console.log(piece);
+  //       console.log(move);
+  //       console.log(this.testMoveForCheck(piece.getPosition(), move, "move"));
+  //       if (this.testMoveForCheck(piece.getPosition(), move, "move")) {
+  //         isCheckmate = false;
+  //       }
+  //     });
+  //     piece.getAttacks().forEach((attack) => {
+  //       if (this.testMoveForCheck(piece.getPosition(), attack, "attack")) {
+  //         isCheckmate = false;
+  //       }
+  //     });
+  //   });
+  //
+  //   return isCheckmate;
+  // }
+
+  getCheck = (): boolean => {
+    return this.check;
+  };
+
+  pawnPromotion(piece: Chesspiece, end: ChessPosition): boolean {
+    if (
+      (piece.getColor() === PieceColor.White && end.y === 7) ||
+      (piece.getColor() === PieceColor.Black && end.y === 0)
+    ) {
+      return true;
+    }
+    return false;
+  }
+
+  public isPieceAt(position: ChessPosition): boolean {
+    return this.board[position.y][position.x] !== null;
+  }
+
+  public getPiece(position: ChessPosition): Chesspiece | null | undefined {
+    try {
+      return this.board[position.y][position.x];
+    } catch (e) {
+      return undefined;
+    }
+  }
+
+  public getKing(color: PieceColor): King {
+    if (color === PieceColor.White) {
+      return this.wKing;
+    } else {
+      return this.bKing;
+    }
+  }
+
+  public killPiece(location: BoardPosition): void {
+    const piece = this.getPiece(location);
+    if (piece) {
+      this.board[location.y][location.x] = null;
+      this.deadPieces.push(piece);
+      this.alivePieces = this.alivePieces.filter((p) => p !== piece);
+    }
+  }
+  public getPieces(color: PieceColor): Chesspiece[] {
+    return this.alivePieces.filter((p) => p?.getColor() === color);
+  }
+
+  public setPieceAt(position: BoardPosition, piece: Chesspiece | null): void {
+    this.board[position.y][position.x] = piece;
+    if (piece) {
+      piece.setPosition(position);
+    }
+  }
+
+  public printBoard(): void {
+    console.log(_.cloneDeep(this.board).reverse());
+  }
+
+  public getAlivePieces(color: PieceColor): Chesspiece[] {
+    return this.alivePieces.filter((p) => p.getColor() === color);
+  }
+
+  public setAlivePieces(pieces: Chesspiece[]): void {
+    this.alivePieces = pieces;
+  }
+
+  public getDeadPieces() {
+    return this.deadPieces;
+  }
+
+  promotePawn(piece: Chesspiece): void {
+    const queen = new Queen(piece.getColor(), piece.getPosition(), this);
+    this.setPieceAt(piece.getPosition(), queen);
+    this.setAlivePieces(this.alivePieces.map((p) => (p === piece ? queen : p)));
+  }
+
+  public changeTurn(): void {
+    this.turn =
+      this.turn === PieceColor.White ? PieceColor.Black : PieceColor.White;
+  }
+  public updateState(): void {
+    this.halfMoves += 1;
+    if (this.turn === PieceColor.Black) {
+      this.fullMoves += 1;
+    }
+    this.changeTurn();
+    this.enPassant = "-";
+
+    //   this.check = this.isCheck();
+    //   this.checkmate = this.isCheckmate();
+    //   if (this.checkmate) {
+    //     this.winner = this.turn === PieceColor.White ? "black" : "white";
+    //   }
+  }
+
   public createPieceFromFENLetter(
     letter: string,
     boardPosition: BoardPosition = new BoardPosition(0, 0),
@@ -230,248 +467,5 @@ export default class ChessBoard {
   }
   public getFENFullMoves() {
     return this.getFEN().split(" ")[5];
-  }
-
-  public move(start: BoardPosition, end: BoardPosition): false | Chessboard {
-    const piece = this.getPiece(start);
-    let moveType = "";
-    if (!piece) return false;
-    if (piece.getColor() !== this.turn) return false;
-    if (piece.isInMoves(end)) {
-      moveType = "move";
-    } else if (piece.isInAttacks(end)) {
-      moveType = "attack";
-    } else {
-      return false;
-    }
-
-    //TODO test for check
-
-    if (!this.testMoveForCheck(start, end, moveType)) return false;
-
-    if (moveType === "move") {
-      piece.move(end);
-    } else if (moveType === "attack") {
-      piece.attack(end);
-    }
-    //   const piece = this.getPiece(start);
-    //   if (!piece) return false;
-    //   if (piece.getColor() !== this.turn) return false;
-    //   if (!piece.canMove(end)) return false;
-    //   if (!this.testMoveForCheck(piece, end)) return false;
-    //   this.makeMove(start, end);
-    //
-    //   if (this.isCheck(this.turn)) {
-    //     this.check = true;
-    //     if (this.isCheckmate(this.turn)) {
-    //       this.checkmate = true;
-    //       this.winner = this.turn === PieceColor.White ? "black" : "white";
-    //     }
-    //   } else {
-    //     this.check = false;
-    //   }
-    this.generatePossibleMovesAndAttacks();
-    this.check = this.isCheck(this.turn);
-
-    this.FEN = this.getFEN();
-    return this.board.map((row: (Chesspiece | null)[]) =>
-      row.slice(),
-    ) as Chessboard;
-  }
-
-  public movePiece(piece: Chesspiece, end: BoardPosition): void {
-    const start = piece.getPosition();
-    this.setPieceAt(end, piece);
-    this.setPieceAt(start, null);
-    this.updateState();
-  }
-  public makeMove(start: BoardPosition, end: BoardPosition): void {
-    let piece = this.getPiece(start);
-    const deadPiece = this.getPiece(end);
-
-    this.setPieceAt(end, piece);
-    this.setPieceAt(start, null);
-
-    if (piece?.getType() === "Pawn" && this.pawnPromotion(piece, end)) {
-      this.promotePawn(piece);
-    }
-    if (piece?.getColor() === PieceColor.Black) {
-      this.fullMoves++;
-    }
-    this.halfMoves++;
-    this.enPassant = "-";
-    piece?.move(
-      new BoardPosition(start.x, start.y),
-      new BoardPosition(end.x, end.y),
-    );
-
-    if (deadPiece) {
-      this.halfMoves = 0;
-      this.deadPieces.push(deadPiece);
-      this.alivePieces = this.alivePieces.filter(
-        (piece) => piece !== deadPiece,
-      );
-    }
-    this.changeTurn();
-    this.moveHistory.push(this.getFEN());
-  }
-
-  getSquareCode(position: ChessPosition): string {
-    const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
-    return `${letters[position.x]}${position.y + 1}`;
-  }
-
-  public generatePossibleMovesAndAttacks(): void {
-    this.possibleMoves = [];
-    this.possibleAttacks = [];
-    this.alivePieces.forEach((piece) => {
-      piece.generateMoves();
-      this.possibleMoves.push(...piece.getMoves());
-      this.possibleAttacks.push(...piece.getAttacks());
-    });
-  }
-  testMoveForCheck(
-    start: BoardPosition,
-    end: BoardPosition,
-    moveType: string,
-  ): boolean {
-    const chessBoardCopy = _.cloneDeep(this);
-    const piece = chessBoardCopy.getPiece(start) as Chesspiece;
-    if (moveType === "move") {
-      piece.move(end);
-    } else if (moveType === "attack") {
-      piece.attack(end);
-    }
-
-    chessBoardCopy.generatePossibleMovesAndAttacks();
-    if (chessBoardCopy.isCheck(this.turn)) return false;
-    return true;
-  }
-  isCheck(color: PieceColor = PieceColor.White): boolean {
-    const king = this.getKing(color);
-    return this.possibleAttacks.some((attack) => {
-      return attack.equals(king.getPosition());
-    });
-  }
-
-  isCheckmate(color: PieceColor = PieceColor.White): boolean {
-    // If the player is not in check, then it's not checkmate
-    if (!this.isCheck(color)) {
-      return false;
-    }
-
-    // Iterate through all of the player's pieces
-    for (const piece of this.getPieces(color)) {
-      // For each piece, iterate through all possible moves
-      for (let x = 0; x < 8; x++) {
-        for (let y = 0; y < 8; y++) {
-          const end = new BoardPosition(x, y);
-          if (piece.canMove(end)) {
-            if (this.testMoveForCheck(piece, end)) {
-              return false;
-            }
-            if (!this.isCheck(color)) {
-              return false;
-            }
-          }
-        }
-      }
-    }
-
-    return true; // No legal moves removed the check, so it's checkmate
-  }
-
-  getCheck = (): boolean => {
-    return this.check;
-  };
-
-  pawnPromotion(piece: Chesspiece, end: ChessPosition): boolean {
-    if (
-      (piece.getColor() === PieceColor.White && end.y === 7) ||
-      (piece.getColor() === PieceColor.Black && end.y === 0)
-    ) {
-      return true;
-    }
-    return false;
-  }
-
-  public isPieceAt(position: ChessPosition): boolean {
-    return this.board[position.y][position.x] !== null;
-  }
-
-  public getPiece(position: ChessPosition): Chesspiece | null | undefined {
-    try {
-      return this.board[position.y][position.x];
-    } catch (e) {
-      return undefined;
-    }
-  }
-
-  public getKing(color: PieceColor): King {
-    if (color === PieceColor.White) {
-      return this.wKing;
-    } else {
-      return this.bKing;
-    }
-  }
-
-  public killPiece(location: BoardPosition): void {
-    const piece = this.getPiece(location);
-    if (piece) {
-      this.board[location.y][location.x] = null;
-      this.deadPieces.push(piece);
-      this.alivePieces = this.alivePieces.filter((p) => p !== piece);
-    }
-  }
-  public getPieces(color: PieceColor): Chesspiece[] {
-    return this.alivePieces.filter((p) => p?.getColor() === color);
-  }
-
-  public setPieceAt(position: BoardPosition, piece: Chesspiece | null): void {
-    this.board[position.y][position.x] = piece;
-    if (piece) {
-      piece.setPosition(position);
-    }
-  }
-
-  public printBoard(): void {
-    console.log(_.cloneDeep(this.board).reverse());
-  }
-
-  public getAlivePieces() {
-    return this.alivePieces;
-  }
-
-  public setAlivePieces(pieces: Chesspiece[]): void {
-    this.alivePieces = pieces;
-  }
-
-  public getDeadPieces() {
-    return this.deadPieces;
-  }
-
-  promotePawn(piece: Chesspiece): void {
-    const queen = new Queen(piece.getColor(), piece.getPosition(), this);
-    this.setPieceAt(piece.getPosition(), queen);
-    this.setAlivePieces(this.alivePieces.map((p) => (p === piece ? queen : p)));
-  }
-
-  public changeTurn(): void {
-    this.turn =
-      this.turn === PieceColor.White ? PieceColor.Black : PieceColor.White;
-  }
-  public updateState(): void {
-    this.halfMoves += 1;
-    if (this.turn === PieceColor.Black) {
-      this.fullMoves += 1;
-    }
-    this.changeTurn();
-    this.enPassant = "-";
-
-    //   this.check = this.isCheck();
-    //   this.checkmate = this.isCheckmate();
-    //   if (this.checkmate) {
-    //     this.winner = this.turn === PieceColor.White ? "black" : "white";
-    //   }
   }
 }
