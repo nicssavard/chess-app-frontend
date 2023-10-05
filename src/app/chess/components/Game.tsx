@@ -40,7 +40,7 @@ const moveVerification = (
   start: ChessPosition,
   end: ChessPosition,
   board: string[][],
-  turn: "w" | "b"
+  turn: "w" | "b",
 ): boolean => {
   if (start.x === end.x && start.y === end.y) return false;
   const piece = board[start.y][start.x];
@@ -66,11 +66,11 @@ export default function Game({ gameId, gameType }: ChessGame) {
     // Initialize WebSocket connection
     if (gameId && user?.id) {
       var ws = new WebSocket(
-        `ws://127.0.0.1:8000/chessGame?chessGameId=${gameId}&userId=${user?.id}`
+        `ws://127.0.0.1:8000/chessGame?chessGameId=${gameId}&userId=${user?.id}`,
       );
     } else {
       var ws = new WebSocket(
-        `ws://127.0.0.1:8000/chessGame?chessGameId=${""}&userId=${user?.id}`
+        `ws://127.0.0.1:8000/chessGame?chessGameId=${""}&userId=${user?.id}`,
       );
     }
     setWebSocket(ws);
@@ -78,7 +78,7 @@ export default function Game({ gameId, gameType }: ChessGame) {
     return () => {
       ws.close();
     };
-  }, []);
+  }, [gameId, user?.id]);
 
   useEffect(() => {
     if (webSocket) {
@@ -94,12 +94,12 @@ export default function Game({ gameId, gameType }: ChessGame) {
           board = JSON.parse(newMessage.board);
           // first message to set the color
           newBoard = fenToBoard(
-            board.fen.split(" ")[0].split("/").reverse().join("/")
+            board.fen.split(" ")[0].split("/").reverse().join("/"),
           );
           setPlayerColor(newMessage.color);
         } else {
           newBoard = fenToBoard(
-            board.fen.split(" ")[0].split("/").reverse().join("/")
+            board.fen.split(" ")[0].split("/").reverse().join("/"),
           );
         }
         setTurn(board.turn);
@@ -149,9 +149,8 @@ export default function Game({ gameId, gameType }: ChessGame) {
             <Board
               playerColor={playerColor}
               board={board}
-              className={`rounded-2xl relative overflow-hidden border-4 ${
-                turn === "w" ? "border-white" : "border-black"
-              }`}
+              className={`rounded-2xl relative overflow-hidden border-4 ${turn === "w" ? "border-white" : "border-black"
+                }`}
             />
           )}
         </div>

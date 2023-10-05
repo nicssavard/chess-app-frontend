@@ -1,7 +1,7 @@
 import { ChessPosition, Chessboard, Chesspiece } from "../../../typings";
 import { Pawn, Rook, Knight, Bishop, Queen, King } from "./ChessPiece";
 import BoardPosition from "./BoardPosition";
-import _, { forEach } from "lodash";
+import _ from "lodash";
 
 export enum PieceColor {
   White = "w",
@@ -38,8 +38,6 @@ export default class ChessBoard {
   }
 
   public initializeBoard(fen: string): void {
-    // Populate the board with pawns
-
     let pieces = this.pieces;
     const fenBoard = fen.split(" ")[0];
     const fenRows = fenBoard.split("/");
@@ -107,8 +105,6 @@ export default class ChessBoard {
       return false;
     }
 
-    //TODO test for check
-
     if (!this.testMoveForCheck(start, end, moveType)) return false;
 
     if (moveType === "move") {
@@ -116,22 +112,6 @@ export default class ChessBoard {
     } else if (moveType === "attack") {
       piece.attack(end);
     }
-    //   const piece = this.getPiece(start);
-    //   if (!piece) return false;
-    //   if (piece.getColor() !== this.turn) return false;
-    //   if (!piece.canMove(end)) return false;
-    //   if (!this.testMoveForCheck(piece, end)) return false;
-    //   this.makeMove(start, end);
-    //
-    //   if (this.isCheck(this.turn)) {
-    //     this.check = true;
-    //     if (this.isCheckmate(this.turn)) {
-    //       this.checkmate = true;
-    //       this.winner = this.turn === PieceColor.White ? "black" : "white";
-    //     }
-    //   } else {
-    //     this.check = false;
-    //   }
     this.generatePossibleMovesAndAttacks();
     this.check = this.isCheck(this.turn);
 

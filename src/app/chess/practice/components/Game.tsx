@@ -8,8 +8,9 @@ import {
 import Board from "./Board";
 import BoardPosition from "@/components/chess/BoardPosition";
 import ChessBoard from "@/components/chess/ChessBoard";
-import { ChessPosition, Chessboard } from "../../../../../typings";
-import _, { set } from "lodash";
+import { Chessboard } from "../../../../../typings";
+import _ from "lodash";
+import BoardSetting from "./BoardSetting";
 
 const idToLocation = (id: UniqueIdentifier): BoardPosition => {
   // get coordinates for the board
@@ -75,8 +76,16 @@ export default function Game() {
     });
     setPossibleMoves(newPossibleMoves);
   };
+
+  const newBoard = (fen: string) => {
+    console.log(fen);
+    const newBoard = new ChessBoard(fen);
+    setChessBoard(newBoard);
+    setBoard(newBoard.board);
+  };
   return (
     <>
+      <BoardSetting newBoard={newBoard} />
       <div className="flex h-20 flex-row justify-center ">
         <span className="flex flex-col justify-center text-4xl">
           {isCheckMate && <span>{win} won</span>}
