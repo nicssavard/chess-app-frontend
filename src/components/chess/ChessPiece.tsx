@@ -57,35 +57,6 @@ export class Chesspiece {
       }
     });
   }
-  protected basicMoveChecks(end: BoardPosition): boolean {
-    if (this.position.x === end.x && this.position.y === end.y) return false;
-    const target = this.board.getPiece(end);
-    if (target && target.color === this.color) return false;
-
-    return true;
-  }
-
-  protected isPathClear(start: BoardPosition, end: BoardPosition): boolean {
-    if (this.isLinear(start, end)) {
-      return this.lineClear(start, end);
-    } else if (this.isDiagonal(start, end)) {
-      return this.diagonalClear(start, end);
-    }
-    return false;
-  }
-
-  protected isLinear(
-    start: { x: number; y: number },
-    end: { x: number; y: number },
-  ) {
-    return start.x === end.x || start.y === end.y;
-  }
-  protected isDiagonal(
-    start: { x: number; y: number },
-    end: { x: number; y: number },
-  ) {
-    return Math.abs(start.x - end.x) === Math.abs(start.y - end.y);
-  }
   protected lineClear(start: BoardPosition, end: BoardPosition) {
     const dir = this.moveDirection(start, end);
     const length = Math.abs(end.x - start.x) || Math.abs(end.y - start.y);
@@ -101,21 +72,6 @@ export class Chesspiece {
     }
     return true;
   }
-  protected diagonalClear(start: BoardPosition, end: BoardPosition) {
-    const dir = this.moveDirection(start, end);
-    for (let i = 1; i < Math.abs(end.y - start.y); i++) {
-      if (
-        this.board.getPiece({
-          x: start.x + i * dir.x,
-          y: start.y + i * dir.y,
-        }) !== null
-      ) {
-        return false;
-      }
-    }
-    return true;
-  }
-
   setPosition(position: BoardPosition) {
     this.position = position;
   }
@@ -135,13 +91,6 @@ export class Chesspiece {
     return this.type;
   }
 
-  public canMoveTo(end: BoardPosition): boolean {
-    return this.possibleMoves.some((move) => move.equals(end));
-  }
-
-  public canAttackTo(end: BoardPosition): boolean {
-    return this.possibleAttacks.some((attack) => attack.equals(end));
-  }
   public getMoves() {
     return this.possibleMoves;
   }

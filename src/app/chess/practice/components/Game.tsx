@@ -27,6 +27,7 @@ export default function Game() {
   const [isCheck, setIsCheck] = useState<boolean>(false);
   const [isCheckMate, setIsCheckMate] = useState<boolean>(false);
   const [win, setWin] = useState<"white" | "black" | "n">("n");
+  const [showPossibleMoves, setShowPossibleMoves] = useState<boolean>(false);
   const [possibleMoves, setPossibleMoves] = useState(
     Array(8)
       .fill(0)
@@ -37,6 +38,8 @@ export default function Game() {
     setChessBoard(test);
     setBoard(test.board);
   }, []);
+
+  useEffect(() => { }, [turn, showPossibleMoves]);
 
   const handleDragEnd = (event: DragEndEvent) => {
     const newPossibleMoves = possibleMoves.map((row) => [...row]);
@@ -77,15 +80,26 @@ export default function Game() {
     setPossibleMoves(newPossibleMoves);
   };
 
-  const newBoard = (fen: string) => {
+  const newBoard = (fen: string, moves: boolean) => {
     console.log(fen);
+    console.log(moves);
+    //need to set the turn, isCheck, isCheckMate, win
+    setShowPossibleMoves(moves);
+    console.log(fen.length);
+    if (fen.length < 40 || fen.length > 100) return;
     const newBoard = new ChessBoard(fen);
     setChessBoard(newBoard);
     setBoard(newBoard.board);
+    setTurn(newBoard.turn);
+    setIsCheck(newBoard.check);
+    if (newBoard.checkmate) {
+      setWin(newBoard.winner);
+    }
+    setIsCheckMate(chessBoard.checkmate);
   };
   return (
     <>
-      <BoardSetting newBoard={newBoard} />
+      <BoardSetting newBoard={newBoard} showPossibleMoves={showPossibleMoves} />
       <div className="flex h-20 flex-row justify-center ">
         <span className="flex flex-col justify-center text-4xl">
           {isCheckMate && <span>{win} won</span>}
