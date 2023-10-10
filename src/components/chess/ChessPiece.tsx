@@ -63,10 +63,9 @@ export class Chesspiece {
     const length = Math.abs(end.x - start.x) || Math.abs(end.y - start.y);
     for (let i = 1; i < length; i++) {
       if (
-        this.board.getPiece({
-          y: start.y + i * dir.y,
-          x: start.x + i * dir.x,
-        }) !== null
+        this.board.getPiece(
+          new BoardPosition(start.x + i * dir.x, start.y + i * dir.y),
+        ) !== null
       ) {
         return false;
       }
@@ -203,6 +202,7 @@ export class Pawn extends Chesspiece {
       this.addAttack(end);
       return true;
     }
+    //todo add check for color
     if (this.getBoard().enPassant === end.toChessNotation()) {
       this.addAttack(end);
       return true;
@@ -310,24 +310,24 @@ export class King extends Chesspiece {
       if (this.getColor() === PieceColor.White) {
         if (end.x === 6) {
           this.getBoard().movePiece(
-            this.getBoard().getPiece({ x: 7, y: 0 })!,
+            this.getBoard().getPiece(new BoardPosition(7, 0))!,
             new BoardPosition(5, 0),
           );
         } else if (end.x === 2) {
           this.getBoard().movePiece(
-            this.getBoard().getPiece({ x: 0, y: 0 })!,
+            this.getBoard().getPiece(new BoardPosition(0, 0))!,
             new BoardPosition(3, 0),
           );
         }
       } else {
         if (end.x === 6) {
           this.getBoard().movePiece(
-            this.getBoard().getPiece({ x: 7, y: 7 })!,
+            this.getBoard().getPiece(new BoardPosition(7, 7))!,
             new BoardPosition(5, 7),
           );
         } else if (end.x === 2) {
           this.getBoard().movePiece(
-            this.getBoard().getPiece({ x: 0, y: 7 })!,
+            this.getBoard().getPiece(new BoardPosition(0, 7))!,
             new BoardPosition(3, 7),
           );
         }
@@ -359,8 +359,8 @@ export class King extends Chesspiece {
     if (this.hasMoved) return;
 
     if (this.getColor() === PieceColor.White) {
-      const rookL = this.getBoard().getPiece({ x: 0, y: 0 });
-      const rookR = this.getBoard().getPiece({ x: 7, y: 0 });
+      const rookL = this.getBoard().getPiece(new BoardPosition(0, 0));
+      const rookR = this.getBoard().getPiece(new BoardPosition(7, 0));
 
       if (rookL) {
         if (this.lineClear(this.getPosition(), new BoardPosition(1, 0)))
@@ -372,8 +372,8 @@ export class King extends Chesspiece {
         }
       }
     } else {
-      const rookL = this.getBoard().getPiece({ x: 0, y: 7 });
-      const rookR = this.getBoard().getPiece({ x: 7, y: 7 });
+      const rookL = this.getBoard().getPiece(new BoardPosition(0, 7));
+      const rookR = this.getBoard().getPiece(new BoardPosition(7, 7));
 
       if (rookL) {
         if (this.lineClear(this.getPosition(), new BoardPosition(1, 7)))

@@ -21,6 +21,10 @@ export default class ChessBoard {
   alivePieces: Chesspiece[] = [];
   deadPieces: Chesspiece[] = [];
   moveHistory: string[] = []; //FEN notation
+  whiteMoves: BoardPosition[] = [];
+  whiteAttacks: BoardPosition[] = [];
+  blackMoves: BoardPosition[] = [];
+  blackAttacks: BoardPosition[] = [];
   possibleMoves: BoardPosition[] = [];
   possibleAttacks: BoardPosition[] = [];
   FEN: string = "";
@@ -144,11 +148,41 @@ export default class ChessBoard {
   public generatePossibleMovesAndAttacks(): void {
     this.possibleMoves = [];
     this.possibleAttacks = [];
-    this.alivePieces.forEach((piece) => {
+    this.whiteMoves = [];
+    this.whiteAttacks = [];
+    this.blackMoves = [];
+    this.blackAttacks = [];
+    this.getAlivePieces(PieceColor.White).forEach((piece) => {
       piece.generateMoves();
-      this.possibleMoves.push(...piece.getMoves());
-      this.possibleAttacks.push(...piece.getAttacks());
+      this.whiteMoves.push(...piece.getMoves());
+      this.whiteAttacks.push(...piece.getAttacks());
     });
+    this.getAlivePieces(PieceColor.Black).forEach((piece) => {
+      piece.generateMoves();
+      this.blackMoves.push(...piece.getMoves());
+      this.blackAttacks.push(...piece.getAttacks());
+    });
+    this.possibleMoves = this.whiteMoves.concat(this.blackMoves);
+    this.possibleAttacks = this.whiteAttacks.concat(this.blackAttacks);
+  }
+
+  getPossibleMoves(color: PieceColor | null = null): BoardPosition[] {
+    if (color === PieceColor.White) {
+      return this.whiteMoves;
+    } else if (color === PieceColor.Black) {
+      return this.blackMoves;
+    } else {
+      return this.possibleMoves;
+    }
+  }
+  getPossibleAttacks(color: PieceColor | null = null): BoardPosition[] {
+    if (color === PieceColor.White) {
+      return this.whiteAttacks;
+    } else if (color === PieceColor.Black) {
+      return this.blackAttacks;
+    } else {
+      return this.possibleAttacks;
+    }
   }
   testMoveForCheck(
     start: BoardPosition,
@@ -197,27 +231,6 @@ export default class ChessBoard {
 
     return isCheckmate;
   }
-  // isCheckmate(color: PieceColor = PieceColor.White): boolean {
-  //   let isCheckmate = true;
-  //   this.getAlivePieces(color).forEach((piece) => {
-  //     piece.getMoves().forEach((move) => {
-  //       console.log(piece);
-  //       console.log(move);
-  //       console.log(this.testMoveForCheck(piece.getPosition(), move, "move"));
-  //       if (this.testMoveForCheck(piece.getPosition(), move, "move")) {
-  //         isCheckmate = false;
-  //       }
-  //     });
-  //     piece.getAttacks().forEach((attack) => {
-  //       if (this.testMoveForCheck(piece.getPosition(), attack, "attack")) {
-  //         isCheckmate = false;
-  //       }
-  //     });
-  //   });
-  //
-  //   return isCheckmate;
-  // }
-
   getCheck = (): boolean => {
     return this.check;
   };
@@ -232,11 +245,11 @@ export default class ChessBoard {
     return false;
   }
 
-  public isPieceAt(position: ChessPosition): boolean {
+  public isPieceAt(position: BoardPosition): boolean {
     return this.board[position.y][position.x] !== null;
   }
 
-  public getPiece(position: ChessPosition): Chesspiece | null | undefined {
+  public getPiece(position: BoardPosition): Chesspiece | null | undefined {
     try {
       return this.board[position.y][position.x];
     } catch (e) {
@@ -275,7 +288,8 @@ export default class ChessBoard {
     console.log(_.cloneDeep(this.board).reverse());
   }
 
-  public getAlivePieces(color: PieceColor): Chesspiece[] {
+  public getAlivePieces(color: PieceColor | null): Chesspiece[] {
+    if (color === null) return this.alivePieces;
     return this.alivePieces.filter((p) => p.getColor() === color);
   }
 
@@ -321,12 +335,6 @@ export default class ChessBoard {
         }
       }
     }
-
-    //   this.check = this.isCheck();
-    //   this.checkmate = this.isCheckmate();
-    //   if (this.checkmate) {
-    //     this.winner = this.turn === PieceColor.White ? "black" : "white";
-    //   }
   }
 
   public createPieceFromFENLetter(

@@ -39,7 +39,21 @@ export default function Game() {
     setBoard(test.board);
   }, []);
 
-  useEffect(() => { }, [turn, showPossibleMoves]);
+  useEffect(() => {
+    if (showPossibleMoves) {
+      const moves = chessBoard?.getPossibleMoves(chessBoard.turn);
+      const attacks = chessBoard?.getPossibleAttacks(chessBoard.turn);
+      if (!moves || !attacks) return;
+      const newPossibleMoves = possibleMoves.map((row) => [...row]);
+      moves.forEach((move: BoardPosition) => {
+        newPossibleMoves[move.y][move.x] = "move";
+      });
+      attacks.forEach((attack: BoardPosition) => {
+        newPossibleMoves[attack.y][attack.x] = "attack";
+      });
+      setPossibleMoves(newPossibleMoves);
+    }
+  }, [turn, showPossibleMoves, chessBoard]);
 
   const handleDragEnd = (event: DragEndEvent) => {
     const newPossibleMoves = possibleMoves.map((row) => [...row]);
@@ -95,7 +109,7 @@ export default function Game() {
     if (newBoard.checkmate) {
       setWin(newBoard.winner);
     }
-    setIsCheckMate(chessBoard.checkmate);
+    setIsCheckMate(newBoard.checkmate);
   };
   return (
     <>
