@@ -9,6 +9,7 @@ export class Chesspiece {
   private type: string;
   public possibleMoves: BoardPosition[] = [];
   public possibleAttacks: BoardPosition[] = [];
+  public hasMoved: boolean = false;
   constructor(
     color: PieceColor,
     position: BoardPosition,
@@ -133,14 +134,6 @@ export class Pawn extends Chesspiece {
   public move(end: BoardPosition) {
     const start = this.getPosition();
     super.move(end);
-    this.getBoard().halfMoves = 0;
-    if (Math.abs(start.y - end.y) === 2) {
-      if (this.getColor() === PieceColor.White) {
-        this.getBoard().enPassant = start.add(0, 1).toChessNotation();
-      } else {
-        this.getBoard().enPassant = start.add(0, -1).toChessNotation();
-      }
-    }
     return;
   }
   public attack(end: BoardPosition) {
@@ -149,7 +142,6 @@ export class Pawn extends Chesspiece {
         end.add(0, this.getColor() === PieceColor.White ? -1 : 1),
       );
       this.getBoard().movePiece(this, end);
-      this.getBoard().halfMoves = 0;
       return;
     } else {
       super.attack(end);
@@ -220,7 +212,6 @@ export class Pawn extends Chesspiece {
 }
 
 export class Rook extends Chesspiece {
-  hasMoved: boolean = false;
   constructor(color: PieceColor, position: BoardPosition, board: ChessBoard) {
     super(color, position, board, "Rook");
   }
@@ -311,11 +302,38 @@ export class Queen extends Chesspiece {
 }
 
 export class King extends Chesspiece {
-  hasMoved: boolean = false;
   constructor(color: PieceColor, position: BoardPosition, board: ChessBoard) {
     super(color, position, board, "King");
   }
   public move(end: BoardPosition): void {
+    if (Math.abs(this.getPosition().x - end.x) === 2) {
+      if (this.getColor() === PieceColor.White) {
+        if (end.x === 6) {
+          this.getBoard().movePiece(
+            this.getBoard().getPiece({ x: 7, y: 0 })!,
+            new BoardPosition(5, 0),
+          );
+        } else if (end.x === 2) {
+          this.getBoard().movePiece(
+            this.getBoard().getPiece({ x: 0, y: 0 })!,
+            new BoardPosition(3, 0),
+          );
+        }
+      } else {
+        if (end.x === 6) {
+          this.getBoard().movePiece(
+            this.getBoard().getPiece({ x: 7, y: 7 })!,
+            new BoardPosition(5, 7),
+          );
+        } else if (end.x === 2) {
+          this.getBoard().movePiece(
+            this.getBoard().getPiece({ x: 0, y: 7 })!,
+            new BoardPosition(3, 7),
+          );
+        }
+      }
+    }
+
     this.hasMoved = true;
     super.move(end);
   }
@@ -335,7 +353,40 @@ export class King extends Chesspiece {
       new BoardPosition(-1, -1),
     ];
     this.generateMovesLine(directions, 1);
+    this.generateCastling();
   }
+  private generateCastling() {
+    if (this.hasMoved) return;
+
+    if (this.getColor() === PieceColor.White) {
+      const rookL = this.getBoard().getPiece({ x: 0, y: 0 });
+      const rookR = this.getBoard().getPiece({ x: 7, y: 0 });
+
+      if (rookL) {
+        if (this.lineClear(this.getPosition(), new BoardPosition(1, 0)))
+          this.addMove(new BoardPosition(2, 0));
+      }
+      if (rookR) {
+        if (this.lineClear(this.getPosition(), new BoardPosition(6, 0))) {
+          this.addMove(new BoardPosition(6, 0));
+        }
+      }
+    } else {
+      const rookL = this.getBoard().getPiece({ x: 0, y: 7 });
+      const rookR = this.getBoard().getPiece({ x: 7, y: 7 });
+
+      if (rookL) {
+        if (this.lineClear(this.getPosition(), new BoardPosition(1, 7)))
+          this.addMove(new BoardPosition(2, 7));
+      }
+      if (rookR) {
+        if (this.lineClear(this.getPosition(), new BoardPosition(6, 7))) {
+          this.addMove(new BoardPosition(6, 7));
+        }
+      }
+    }
+  }
+
   canMoveTo(end: BoardPosition): boolean {
     return (
       Math.abs(this.getPosition().x - end.x) <= 1 &&

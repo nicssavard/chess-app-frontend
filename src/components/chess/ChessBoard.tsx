@@ -112,6 +112,7 @@ export default class ChessBoard {
     } else if (moveType === "attack") {
       piece.attack(end);
     }
+    this.updateState(start, end, piece, moveType);
     this.generatePossibleMovesAndAttacks();
     this.check = this.isCheck(this.turn);
 
@@ -123,6 +124,7 @@ export default class ChessBoard {
     }
 
     this.FEN = this.getFEN();
+    // console.log(this);
     return this.board.map((row: (Chesspiece | null)[]) =>
       row.slice(),
     ) as Chessboard;
@@ -132,7 +134,6 @@ export default class ChessBoard {
     const start = piece.getPosition();
     this.setPieceAt(end, piece);
     this.setPieceAt(start, null);
-    this.updateState();
   }
 
   getSquareCode(position: ChessPosition): string {
@@ -296,13 +297,30 @@ export default class ChessBoard {
     this.turn =
       this.turn === PieceColor.White ? PieceColor.Black : PieceColor.White;
   }
-  public updateState(): void {
+  public updateState(
+    start: BoardPosition,
+    end: BoardPosition,
+    piece: Chesspiece,
+    moveType: string,
+  ): void {
     this.halfMoves += 1;
     if (this.turn === PieceColor.Black) {
       this.fullMoves += 1;
     }
     this.changeTurn();
     this.enPassant = "-";
+    if (moveType === "attack") {
+      this.halfMoves = 0;
+    } else if (piece.getType() === "Pawn") {
+      this.halfMoves = 0;
+      if (Math.abs(start.y - end.y) === 2) {
+        if (piece.getColor() === PieceColor.White) {
+          this.enPassant = start.add(0, 1).toChessNotation();
+        } else {
+          this.enPassant = start.add(0, -1).toChessNotation();
+        }
+      }
+    }
 
     //   this.check = this.isCheck();
     //   this.checkmate = this.isCheckmate();
