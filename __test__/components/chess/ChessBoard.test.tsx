@@ -1,5 +1,5 @@
 import BoardPosition from "@/components/chess/BoardPosition";
-import ChessBoard from "@/components/chess/ChessBoard";
+import ChessBoard, { PieceColor } from "@/components/chess/ChessBoard";
 
 describe("ChessBoard", () => {
   test("chessboard square are identified properly", () => {
@@ -102,5 +102,17 @@ describe("ChessBoard", () => {
     expect(
       chessBoard.move(new BoardPosition(5, 6), new BoardPosition(5, 5)),
     ).toBe(false);
+  });
+  test("test isThreatened", () => {
+    const chessBoard = new ChessBoard(
+      "rn1qkbnr/ppp1pppp/8/3p3b/3PPB2/2NQ4/PPP2PPP/R3KBNR b KQkq e3 0 5",
+    );
+    expect(
+      chessBoard.isThreatened(new BoardPosition(4, 0), PieceColor.Black),
+    ).toBe(false);
+    chessBoard.generatePossibleMovesAndAttacks();
+    expect(
+      chessBoard.isThreatened(new BoardPosition(3, 0), PieceColor.Black),
+    ).toBe(true);
   });
 });

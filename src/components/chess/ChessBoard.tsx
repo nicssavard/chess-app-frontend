@@ -94,6 +94,7 @@ export default class ChessBoard {
     this.alivePieces.forEach((piece) => {
       piece.generateMoves();
     });
+    this.generatePossibleMovesAndAttacks();
   }
 
   public move(start: BoardPosition, end: BoardPosition): false | Chessboard {
@@ -118,6 +119,7 @@ export default class ChessBoard {
     }
     this.updateState(start, end, piece, moveType);
     this.generatePossibleMovesAndAttacks();
+    this.isThreatened(new BoardPosition(3, 3), this.turn);
     this.check = this.isCheck(this.turn);
 
     if (this.check) {
@@ -128,7 +130,6 @@ export default class ChessBoard {
     }
 
     this.FEN = this.getFEN();
-    // console.log(this);
     return this.board.map((row: (Chesspiece | null)[]) =>
       row.slice(),
     ) as Chessboard;
@@ -164,8 +165,19 @@ export default class ChessBoard {
     });
     this.possibleMoves = this.whiteMoves.concat(this.blackMoves);
     this.possibleAttacks = this.whiteAttacks.concat(this.blackAttacks);
+    this.generateCastlingMoves();
   }
 
+  generateCastlingMoves(): void {
+    this.wKing.generateCastlingMoves();
+    this.bKing.generateCastlingMoves();
+    this.whiteMoves.push(...this.wKing.getMoves());
+    this.whiteAttacks.push(...this.wKing.getAttacks());
+    this.blackMoves.push(...this.bKing.getMoves());
+    this.blackAttacks.push(...this.bKing.getAttacks());
+    this.possibleMoves = this.whiteMoves.concat(this.blackMoves);
+    this.possibleAttacks = this.whiteAttacks.concat(this.blackAttacks);
+  }
   getPossibleMoves(color: PieceColor | null = null): BoardPosition[] {
     if (color === PieceColor.White) {
       return this.whiteMoves;
@@ -234,6 +246,18 @@ export default class ChessBoard {
   getCheck = (): boolean => {
     return this.check;
   };
+  public isThreatened(position: BoardPosition, color: PieceColor): boolean {
+    const moves = this.getPossibleMoves();
+    let isThreatened =
+      this.getPossibleAttacks(color).some((attack) => {
+        return attack.equals(position);
+      }) ||
+      this.getPossibleMoves(color).some((move) => {
+        return move.equals(position);
+      });
+
+    return isThreatened;
+  }
 
   pawnPromotion(piece: Chesspiece, end: ChessPosition): boolean {
     if (

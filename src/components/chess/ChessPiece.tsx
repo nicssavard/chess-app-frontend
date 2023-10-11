@@ -72,6 +72,25 @@ export class Chesspiece {
     }
     return true;
   }
+
+  public lineNotThreatened(start: BoardPosition, end: BoardPosition) {
+    const dir = this.moveDirection(start, end);
+    const length = Math.abs(end.x - start.x) || Math.abs(end.y - start.y);
+    for (let i = 0; i <= length; i++) {
+      if (
+        this.getBoard().isThreatened(
+          new BoardPosition(start.x + i * dir.x, start.y + i * dir.y),
+          this.getColor() === PieceColor.White
+            ? PieceColor.Black
+            : PieceColor.White,
+        )
+      ) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   setPosition(position: BoardPosition) {
     this.position = position;
   }
@@ -353,40 +372,86 @@ export class King extends Chesspiece {
       new BoardPosition(-1, -1),
     ];
     this.generateMovesLine(directions, 1);
-    this.generateCastling();
   }
-  private generateCastling() {
+  generateCastlingMoves() {
     if (this.hasMoved) return;
 
-    if (this.getColor() === PieceColor.White) {
-      const rookL = this.getBoard().getPiece(new BoardPosition(0, 0));
-      const rookR = this.getBoard().getPiece(new BoardPosition(7, 0));
+    const y = this.getColor() === PieceColor.White ? 0 : 7;
 
-      if (rookL) {
-        if (this.lineClear(this.getPosition(), new BoardPosition(1, 0)))
-          this.addMove(new BoardPosition(2, 0));
-      }
-      if (rookR) {
-        if (this.lineClear(this.getPosition(), new BoardPosition(6, 0))) {
-          this.addMove(new BoardPosition(6, 0));
-        }
-      }
-    } else {
-      const rookL = this.getBoard().getPiece(new BoardPosition(0, 7));
-      const rookR = this.getBoard().getPiece(new BoardPosition(7, 7));
+    this.tryCastling(
+      new BoardPosition(0, y),
+      new BoardPosition(2, y),
+      new BoardPosition(1, y),
+    );
+    this.tryCastling(
+      new BoardPosition(7, y),
+      new BoardPosition(6, y),
+      new BoardPosition(6, y),
+    );
+  }
 
-      if (rookL) {
-        if (this.lineClear(this.getPosition(), new BoardPosition(1, 7)))
-          this.addMove(new BoardPosition(2, 7));
-      }
-      if (rookR) {
-        if (this.lineClear(this.getPosition(), new BoardPosition(6, 7))) {
-          this.addMove(new BoardPosition(6, 7));
-        }
-      }
+  private tryCastling(
+    rookPosition: BoardPosition,
+    castlingPosition: BoardPosition,
+    checkPosition: BoardPosition,
+  ) {
+    const rook = this.getBoard().getPiece(rookPosition);
+    if (rook && this.isCastlingPossible(checkPosition, rook)) {
+      this.addMove(castlingPosition);
     }
   }
 
+  private isCastlingPossible(checkPosition: BoardPosition, rook: any): boolean {
+    return (
+      this.lineClear(this.getPosition(), checkPosition) &&
+      this.lineNotThreatened(this.getPosition(), rook.getPosition())
+    );
+  }
+
+  // generateCastling() {
+  //   if (this.hasMoved) return;
+  //   if (this.getColor() === PieceColor.White) {
+  //     const rookL = this.getBoard().getPiece(new BoardPosition(0, 0));
+  //     const rookR = this.getBoard().getPiece(new BoardPosition(7, 0));
+  //
+  //     if (rookL) {
+  //       if (
+  //         this.lineClear(this.getPosition(), new BoardPosition(1, 0)) &&
+  //         this.lineNotThreatened(this.getPosition(), rookL.getPosition())
+  //       )
+  //         this.addMove(new BoardPosition(2, 0));
+  //     }
+  //     if (rookR) {
+  //       if (
+  //         this.lineClear(this.getPosition(), new BoardPosition(6, 0)) &&
+  //         this.lineNotThreatened(this.getPosition(), rookR.getPosition())
+  //       ) {
+  //         this.addMove(new BoardPosition(6, 0));
+  //       }
+  //     }
+  //   } else {
+  //     const rookL = this.getBoard().getPiece(new BoardPosition(0, 7));
+  //     const rookR = this.getBoard().getPiece(new BoardPosition(7, 7));
+  //
+  //     if (rookL) {
+  //       if (
+  //         this.lineClear(this.getPosition(), new BoardPosition(1, 7)) &&
+  //         this.lineNotThreatened(this.getPosition(), rookL.getPosition())
+  //       ) {
+  //         this.addMove(new BoardPosition(2, 7));
+  //       }
+  //     }
+  //     if (rookR) {
+  //       if (
+  //         this.lineClear(this.getPosition(), new BoardPosition(6, 7)) &&
+  //         this.lineNotThreatened(this.getPosition(), rookR.getPosition())
+  //       ) {
+  //         this.addMove(new BoardPosition(6, 7));
+  //       }
+  //     }
+  //   }
+  // }
+  //
   canMoveTo(end: BoardPosition): boolean {
     return (
       Math.abs(this.getPosition().x - end.x) <= 1 &&
