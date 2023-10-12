@@ -1,3 +1,4 @@
+import PromotionModal from "./PromotionModal";
 import { useState, useEffect } from "react";
 import {
   DndContext,
@@ -11,6 +12,7 @@ import ChessBoard from "@/components/chess/ChessBoard";
 import { Chessboard } from "../../../../../typings";
 import _ from "lodash";
 import BoardSetting from "./BoardSetting";
+import { Chesspiece } from "@/components/chess/ChessPiece";
 
 const idToLocation = (id: UniqueIdentifier): BoardPosition => {
   // get coordinates for the board
@@ -28,6 +30,11 @@ export default function Game() {
   const [isCheckMate, setIsCheckMate] = useState<boolean>(false);
   const [win, setWin] = useState<"white" | "black" | "n">("n");
   const [showPossibleMoves, setShowPossibleMoves] = useState<boolean>(false);
+  const [promotion, setPromotion] = useState<{
+    start: BoardPosition | null;
+    end: BoardPosition | null;
+    piece: string | null;
+  }>({ start: null, end: null, piece: null });
   const [possibleMoves, setPossibleMoves] = useState(
     Array(8)
       .fill(0)
@@ -39,6 +46,18 @@ export default function Game() {
     setBoard(test.board);
   }, []);
 
+  useEffect(() => {
+    if (promotion.start && promotion.end && promotion.piece) {
+      const newBoard = chessBoard?.move(
+        promotion.start,
+        promotion.end,
+        promotion.piece,
+      );
+      if (!newBoard) return;
+      completeMove();
+      setPromotion({ start: null, end: null, piece: null });
+    }
+  }, [promotion, chessBoard]);
   useEffect(() => {
     if (showPossibleMoves) {
       const moves = chessBoard?.getPossibleMoves(chessBoard.turn);
@@ -65,16 +84,17 @@ export default function Game() {
     const start = idToLocation(event.active?.id);
     const end = idToLocation(event.over?.id);
     //if (start.x === end.x && start.y === end.y) return;
-    const newBoard = chessBoard.move(start, end);
-    if (!newBoard) {
-      return false;
+    let newBoard = null;
+    if (checkPawnPromotion(start, end)) {
+      setPromotion({ start: start, end: end, piece: null });
+    } else {
+      newBoard = chessBoard.move(start, end);
+
+      if (!newBoard) {
+        return false;
+      }
+      completeMove();
     }
-    setTurn(chessBoard.turn);
-    setIsCheck(chessBoard.check);
-    if (chessBoard.checkmate) {
-      setWin(chessBoard.winner);
-    }
-    setIsCheckMate(chessBoard.checkmate);
   };
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -92,6 +112,15 @@ export default function Game() {
       newPossibleMoves[attack.y][attack.x] = "attack";
     });
     setPossibleMoves(newPossibleMoves);
+  };
+  const completeMove = () => {
+    if (!chessBoard) return;
+    setTurn(chessBoard.turn);
+    setIsCheck(chessBoard.check);
+    if (chessBoard.checkmate) {
+      setWin(chessBoard.winner);
+    }
+    setIsCheckMate(chessBoard.checkmate);
   };
 
   const newBoard = (fen: string, moves: boolean) => {
@@ -111,9 +140,43 @@ export default function Game() {
     }
     setIsCheckMate(newBoard.checkmate);
   };
+
+  const checkPawnPromotion = (start: BoardPosition, end: BoardPosition) => {
+    const piece = chessBoard?.getPiece(start);
+    const endPiece = chessBoard?.getPiece(end);
+    if (!piece) return;
+
+    if (
+      piece.getType() === "Pawn" &&
+      (end.y === 7 || end.y === 0) &&
+      Math.abs(end.y - start.y) === 1
+    ) {
+      if (Math.abs(end.x - start.x) === 1 && endPiece) {
+        return true;
+      } else if (end.x === start.x && !endPiece) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  const logFen = () => {
+    console.log(chessBoard?.getFEN());
+  };
+
+  const pieceToPromote = (piece: string) => {
+    console.log(piece);
+    setPromotion({ start: promotion.start, end: promotion.end, piece: piece });
+  };
+
   return (
     <>
-      <BoardSetting newBoard={newBoard} showPossibleMoves={showPossibleMoves} />
+      <BoardSetting
+        newBoard={newBoard}
+        showPossibleMoves={showPossibleMoves}
+        logFen={logFen}
+      />
+      {promotion.start && <PromotionModal onPromote={pieceToPromote} />}
       <div className="flex h-20 flex-row justify-center ">
         <span className="flex flex-col justify-center text-4xl">
           {isCheckMate && <span>{win} won</span>}

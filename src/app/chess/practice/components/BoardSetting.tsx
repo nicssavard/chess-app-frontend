@@ -5,8 +5,9 @@ import { useRef } from "react";
 interface props {
   newBoard: (fen: string, moved: boolean) => void;
   showPossibleMoves: boolean;
+  logFen: () => void;
 }
-const BoardSetting = ({ newBoard, showPossibleMoves }: props) => {
+const BoardSetting = ({ newBoard, showPossibleMoves, logFen }: props) => {
   const fenRef = useRef<HTMLInputElement>(null);
   const movesRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = React.useState(false);
@@ -50,6 +51,7 @@ const BoardSetting = ({ newBoard, showPossibleMoves }: props) => {
           <Dialog.Title className="m-0 text-[17px] font-medium text-mauve12">
             Board Settings
           </Dialog.Title>
+          <button onClick={logFen}>log fen</button>
           <form className="flex flex-col" onSubmit={HandleNewBoard}>
             <div className="flex flex-row justify-between gap-5">
               <label>Fen</label>
