@@ -13,6 +13,8 @@ import { Chessboard } from "../../../../../typings";
 import _ from "lodash";
 import BoardSetting from "./BoardSetting";
 import { Chesspiece } from "@/components/chess/ChessPiece";
+import DeadPieces from "./DeadPieces";
+import { PieceColor } from "@/components/chess/ChessBoard";
 
 const idToLocation = (id: UniqueIdentifier): BoardPosition => {
   // get coordinates for the board
@@ -30,6 +32,8 @@ export default function Game() {
   const [isCheckMate, setIsCheckMate] = useState<boolean>(false);
   const [win, setWin] = useState<"white" | "black" | "n">("n");
   const [showPossibleMoves, setShowPossibleMoves] = useState<boolean>(false);
+  const [deadWhitePieces, setDeadWhitePieces] = useState<Chesspiece[]>([]);
+  const [deadBlackPieces, setDeadBlackPieces] = useState<Chesspiece[]>([]);
   const [promotion, setPromotion] = useState<{
     start: BoardPosition | null;
     end: BoardPosition | null;
@@ -58,6 +62,7 @@ export default function Game() {
       setPromotion({ start: null, end: null, piece: null });
     }
   }, [promotion, chessBoard]);
+
   useEffect(() => {
     if (showPossibleMoves) {
       const moves = chessBoard?.getPossibleMoves(chessBoard.turn);
@@ -116,6 +121,8 @@ export default function Game() {
   const completeMove = () => {
     if (!chessBoard) return;
     setTurn(chessBoard.turn);
+    setDeadWhitePieces(chessBoard.getDeadPieces(PieceColor.White));
+    setDeadBlackPieces(chessBoard.getDeadPieces(PieceColor.Black));
     setIsCheck(chessBoard.check);
     if (chessBoard.checkmate) {
       setWin(chessBoard.winner);
@@ -165,7 +172,9 @@ export default function Game() {
     console.log(piece);
     setPromotion({ start: promotion.start, end: promotion.end, piece: piece });
   };
-
+  if (!chessBoard) {
+    return <div>loading</div>;
+  }
   return (
     <>
       <BoardSetting
@@ -173,29 +182,18 @@ export default function Game() {
         showPossibleMoves={showPossibleMoves}
         logFen={logFen}
       />
-      {promotion.start && <PromotionModal onPromote={pieceToPromote} />}
       <div className="flex h-20 flex-row justify-center ">
         <span className="flex flex-col justify-center text-4xl">
           {isCheckMate && <span>{win} won</span>}
           {isCheck && !isCheckMate && <span>Check</span>}
           {/* {!isCheck && !isCheckMate && <span>{turn}</span>} */}
         </span>
+        {promotion.start && (
+          <PromotionModal onPromote={pieceToPromote} color={turn} />
+        )}
       </div>
+      <DeadPieces deadPieces={deadWhitePieces} color="white" />
       <div className="flex flex-row justify-center">
-        {/* <div className="flex flex-col justify-end w-10">
-          {initialBoard.deadPieces
-            .filter((p) => p.color === "white")
-            .map((piece) => {
-              return (
-                <img
-                  src={`/chessPieces/${piece.color}${piece.type}.png`}
-                  alt={`/chessPieces/${piece.color}${piece.type}.png`}
-                  className="h-10 w-10 shrink"
-                  key={piece.id}
-                />
-              );
-            })}
-        </div> */}
         <DndContext onDragEnd={handleDragEnd} onDragStart={handleDragStart}>
           <div className="flex flex-col">
             {board && (
@@ -223,6 +221,7 @@ export default function Game() {
             })}
         </div> */}
       </div>
+      <DeadPieces deadPieces={deadBlackPieces} color="black" />
     </>
   );
 }

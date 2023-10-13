@@ -10,6 +10,7 @@ export class Chesspiece {
   public possibleMoves: BoardPosition[] = [];
   public possibleAttacks: BoardPosition[] = [];
   public hasMoved: boolean = false;
+  public value: number = 0;
   constructor(
     color: PieceColor,
     position: BoardPosition,
@@ -127,10 +128,12 @@ export class Chesspiece {
     this.possibleAttacks = [];
   }
   public move(end: BoardPosition) {
+    this.hasMoved = true;
     this.getBoard().movePiece(this, end);
     return;
   }
   public attack(end: BoardPosition) {
+    this.hasMoved = true;
     this.getBoard().killPiece(end);
     this.getBoard().movePiece(this, end);
     this.getBoard().halfMoves = 0;
@@ -145,6 +148,7 @@ export class Chesspiece {
 }
 
 export class Pawn extends Chesspiece {
+  public value: number = 1;
   constructor(color: PieceColor, position: BoardPosition, board: ChessBoard) {
     super(color, position, board, "Pawn");
   }
@@ -222,15 +226,18 @@ export class Pawn extends Chesspiece {
       return true;
     }
     //todo add check for color
-    if (this.getBoard().enPassant === end.toChessNotation()) {
-      this.addAttack(end);
-      return true;
+    if (this.getBoard().turn === this.getColor()) {
+      if (this.getBoard().enPassant === end.toChessNotation()) {
+        this.addAttack(end);
+        return true;
+      }
     }
     return false;
   }
 }
 
 export class Rook extends Chesspiece {
+  public value: number = 5;
   constructor(color: PieceColor, position: BoardPosition, board: ChessBoard) {
     super(color, position, board, "Rook");
   }
@@ -255,6 +262,7 @@ export class Rook extends Chesspiece {
 }
 
 export class Knight extends Chesspiece {
+  public value: number = 3;
   constructor(color: PieceColor, position: BoardPosition, board: ChessBoard) {
     super(color, position, board, "Knight");
   }
@@ -287,6 +295,7 @@ export class Knight extends Chesspiece {
 }
 
 export class Bishop extends Chesspiece {
+  public value: number = 3;
   constructor(color: PieceColor, position: BoardPosition, board: ChessBoard) {
     super(color, position, board, "Bishop");
   }
@@ -302,6 +311,7 @@ export class Bishop extends Chesspiece {
 }
 
 export class Queen extends Chesspiece {
+  public value: number = 9;
   constructor(color: PieceColor, position: BoardPosition, board: ChessBoard) {
     super(color, position, board, "Queen");
   }
@@ -321,6 +331,7 @@ export class Queen extends Chesspiece {
 }
 
 export class King extends Chesspiece {
+  public value: number = 100;
   constructor(color: PieceColor, position: BoardPosition, board: ChessBoard) {
     super(color, position, board, "King");
   }
@@ -408,50 +419,6 @@ export class King extends Chesspiece {
     );
   }
 
-  // generateCastling() {
-  //   if (this.hasMoved) return;
-  //   if (this.getColor() === PieceColor.White) {
-  //     const rookL = this.getBoard().getPiece(new BoardPosition(0, 0));
-  //     const rookR = this.getBoard().getPiece(new BoardPosition(7, 0));
-  //
-  //     if (rookL) {
-  //       if (
-  //         this.lineClear(this.getPosition(), new BoardPosition(1, 0)) &&
-  //         this.lineNotThreatened(this.getPosition(), rookL.getPosition())
-  //       )
-  //         this.addMove(new BoardPosition(2, 0));
-  //     }
-  //     if (rookR) {
-  //       if (
-  //         this.lineClear(this.getPosition(), new BoardPosition(6, 0)) &&
-  //         this.lineNotThreatened(this.getPosition(), rookR.getPosition())
-  //       ) {
-  //         this.addMove(new BoardPosition(6, 0));
-  //       }
-  //     }
-  //   } else {
-  //     const rookL = this.getBoard().getPiece(new BoardPosition(0, 7));
-  //     const rookR = this.getBoard().getPiece(new BoardPosition(7, 7));
-  //
-  //     if (rookL) {
-  //       if (
-  //         this.lineClear(this.getPosition(), new BoardPosition(1, 7)) &&
-  //         this.lineNotThreatened(this.getPosition(), rookL.getPosition())
-  //       ) {
-  //         this.addMove(new BoardPosition(2, 7));
-  //       }
-  //     }
-  //     if (rookR) {
-  //       if (
-  //         this.lineClear(this.getPosition(), new BoardPosition(6, 7)) &&
-  //         this.lineNotThreatened(this.getPosition(), rookR.getPosition())
-  //       ) {
-  //         this.addMove(new BoardPosition(6, 7));
-  //       }
-  //     }
-  //   }
-  // }
-  //
   canMoveTo(end: BoardPosition): boolean {
     return (
       Math.abs(this.getPosition().x - end.x) <= 1 &&

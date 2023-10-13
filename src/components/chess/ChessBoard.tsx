@@ -7,7 +7,7 @@ export enum PieceColor {
   White = "w",
   Black = "b",
 }
-
+//TODO check if game is a draw wither by stalemate or 50 move rule
 export default class ChessBoard {
   board: Chessboard = []; //has to be checked with y,x  board[y][x]
   turn: PieceColor = PieceColor.White;
@@ -97,7 +97,11 @@ export default class ChessBoard {
     this.generatePossibleMovesAndAttacks();
   }
 
-  public move(start: BoardPosition, end: BoardPosition): false | Chessboard {
+  public move(
+    start: BoardPosition,
+    end: BoardPosition,
+    pawnPromotionPiece: string = "",
+  ): false | Chessboard {
     const piece = this.getPiece(start);
     let moveType = "";
     if (!piece) return false;
@@ -117,6 +121,11 @@ export default class ChessBoard {
     } else if (moveType === "attack") {
       piece.attack(end);
     }
+    if (pawnPromotionPiece) {
+      console.log("promoting");
+      this.promotePawn(piece, pawnPromotionPiece);
+    }
+
     this.updateState(start, end, piece, moveType);
     this.generatePossibleMovesAndAttacks();
     this.isThreatened(new BoardPosition(3, 3), this.turn);
@@ -321,14 +330,26 @@ export default class ChessBoard {
     this.alivePieces = pieces;
   }
 
-  public getDeadPieces() {
+  public getDeadPieces(color: PieceColor | null): Chesspiece[] {
+    if (color === PieceColor.White) {
+      return this.deadPieces.filter((p) => p.getColor() === PieceColor.White);
+    }
+    if (color === PieceColor.Black) {
+      return this.deadPieces.filter((p) => p.getColor() === PieceColor.Black);
+    }
     return this.deadPieces;
   }
 
-  promotePawn(piece: Chesspiece): void {
-    const queen = new Queen(piece.getColor(), piece.getPosition(), this);
-    this.setPieceAt(piece.getPosition(), queen);
-    this.setAlivePieces(this.alivePieces.map((p) => (p === piece ? queen : p)));
+  promotePawn(piece: Chesspiece, pawnPromotionPiece: string): void {
+    const newPiece = this.createPieceFromFENLetter(
+      pawnPromotionPiece,
+      piece.getPosition(),
+    ) as Chesspiece;
+    console.log(newPiece);
+    this.setPieceAt(piece.getPosition(), newPiece);
+    this.setAlivePieces(
+      this.alivePieces.map((p) => (p === piece ? newPiece : p)),
+    );
   }
 
   public changeTurn(): void {
