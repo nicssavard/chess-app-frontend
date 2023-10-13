@@ -124,12 +124,9 @@ export default function Game() {
   };
 
   const newBoard = (fen: string, moves: boolean) => {
-    console.log(fen);
-    console.log(moves);
     //need to set the turn, isCheck, isCheckMate, win
     setShowPossibleMoves(moves);
-    console.log(fen.length);
-    if (fen.length < 40 || fen.length > 100) return;
+    if (fen.length < 20 || fen.length > 100) return;
     const newBoard = new ChessBoard(fen);
     setChessBoard(newBoard);
     setBoard(newBoard.board);
