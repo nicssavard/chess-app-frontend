@@ -66,11 +66,12 @@ export default function Game({ gameId, gameType }: ChessGame) {
     // Initialize WebSocket connection
     if (gameId && user?.id) {
       var ws = new WebSocket(
-        `ws://127.0.0.1:8000/chessGame?chessGameId=${gameId}&userId=${user?.id}`,
+        `ws://3.134.114.17:8000/chessGame?chessGameId=${gameId}&userId=${user?.id}`,
       );
     } else {
       var ws = new WebSocket(
-        `ws://127.0.0.1:8000/chessGame?chessGameId=${""}&userId=${user?.id}`,
+        `ws://3.134.114.17:8000/chessGame?chessGameId=${""}&userId=${user?.id}`,
+        // `ws://127.0.0.1:8000/chessGame?chessGameId=${""}&userId=${user?.id}`,
       );
     }
     setWebSocket(ws);
