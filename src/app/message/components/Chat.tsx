@@ -15,7 +15,7 @@ export default function Chat({ receiverID }: Props) {
 
   useEffect(() => {
     // Initialize WebSocket connection
-    const ws = new WebSocket(`ws://127.0.0.1:8000/chat?chatId=${chat?.id}`);
+    const ws = new WebSocket(`ws://127.0.0.1:8000/chat/?chatId=${chat?.id}`);
     setWebSocket(ws);
 
     return () => {
@@ -94,7 +94,7 @@ export default function Chat({ receiverID }: Props) {
   };
 
   return (
-    <div className="bg-gray-700 min-h-full rounded-xl mx-10 flex flex-col">
+    <div className="mx-10 flex min-h-full flex-col rounded-xl bg-gray-700">
       <div className=" flex-grow">
         <div className="flex flex-col ">
           {chat && userID && <ChatList chat={chat} userID={userID} />}
@@ -128,16 +128,14 @@ interface MessageProps {
 const Message = ({ message, userId }: MessageProps) => {
   return (
     <div
-      className={`flex flex-row ${
-        userId === message.sender ? "justify-start" : "justify-end"
-      }`}
+      className={`flex flex-row ${userId === message.sender ? "justify-start" : "justify-end"
+        }`}
     >
       <div
-        className={`rounded-lg p-2 my-1 mx-2 ${
-          userId === message.sender
-            ? "bg-blue-400 text-white mr-15"
-            : "bg-slate-200 text-slate-900 ml-15"
-        }`}
+        className={`rounded-lg p-2 my-1 mx-2 ${userId === message.sender
+            ? "mr-15 bg-blue-400 text-white"
+            : "ml-15 bg-slate-200 text-slate-900"
+          }`}
       >
         {message.content}
       </div>
