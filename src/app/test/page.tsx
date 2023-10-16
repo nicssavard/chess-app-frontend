@@ -46,7 +46,7 @@ export default function Test() {
   useEffect(() => {
     // Initialize WebSocket connection
     const ws = new WebSocket(
-      `ws://${process.env.NEXT_PUBLIC_SERVER}/chessGame?chessGameId=${"1"}`,
+      `${process.env.NEXT_PUBLIC_SERVER_WS}/chessGame?chessGameId=${"1"}`,
     );
     setWebSocket(ws);
 

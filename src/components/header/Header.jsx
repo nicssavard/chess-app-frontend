@@ -28,14 +28,11 @@ export default function Header() {
     const get_user_from_token = async () => {
       var validUser = null;
       await axios
-        .get(
-          `http://${process.env.NEXT_PUBLIC_SERVER}/api/get_user_from_token/`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+        .get(`${process.env.NEXT_PUBLIC_SERVER}/api/get_user_from_token/`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
           },
-        )
+        })
         .then((response) => {
           // Process the response data
           const user = { ...response.data.user, token };
@@ -56,7 +53,7 @@ export default function Header() {
     const refresh_token = async () => {
       const refresh_token = getCookie("refresh_token");
       axios
-        .post(`http://${process.env.NEXT_PUBLIC_SERVER}/api/token/refresh/`, {
+        .post(`${process.env.NEXT_PUBLIC_SERVER}/api/token/refresh/`, {
           refresh: refresh_token,
         })
         .then((response) => {

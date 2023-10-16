@@ -67,11 +67,11 @@ export default function Game({ gameId, gameType }: ChessGame) {
     console.log(process.env.NEXT_PUBLIC_SERVER);
     if (gameId && user?.id) {
       var ws = new WebSocket(
-        `ws://${process.env.NEXT_PUBLIC_SERVER}/chessGame/?chessGameId=${gameId}&userId=${user?.id}`,
+        `${process.env.NEXT_PUBLIC_SERVER_WS}/chessGame/?chessGameId=${gameId}&userId=${user?.id}`,
       );
     } else {
       var ws = new WebSocket(
-        `ws://${process.env.NEXT_PUBLIC_SERVER
+        `${process.env.NEXT_PUBLIC_SERVER_WS
         }/chessGame/?chessGameId=${""}&userId=${user?.id}`,
       );
     }

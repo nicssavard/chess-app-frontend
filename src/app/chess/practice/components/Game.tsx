@@ -50,7 +50,7 @@ export default function Game() {
     setChessBoard(test);
     setBoard(test.board);
     axios
-      .get(`http://${process.env.NEXT_PUBLIC_SERVER}/api/test/`)
+      .get(`${process.env.NEXT_PUBLIC_SERVER}/api/test/`)
       .then(function(response) {
         console.log(response.data.message);
       })

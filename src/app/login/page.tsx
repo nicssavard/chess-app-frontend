@@ -29,7 +29,7 @@ export default function Login() {
 
   const login = async (username: string, password: string) => {
     axios
-      .post(`http://${process.env.NEXT_PUBLIC_SERVER}/api/login/`, {
+      .post(`${process.env.NEXT_PUBLIC_SERVER}/api/login/`, {
         username: username,
         password: password,
       })
