@@ -46,7 +46,7 @@ export default function Test() {
   useEffect(() => {
     // Initialize WebSocket connection
     const ws = new WebSocket(
-      `ws://127.0.0.1:8000/chessGame?chessGameId=${"1"}`
+      `ws://${process.env.NEXT_PUBLIC_SERVER}/chessGame?chessGameId=${"1"}`,
     );
     setWebSocket(ws);
 
@@ -71,7 +71,7 @@ export default function Test() {
         //   .reverse()
         //   .join("/");
         const newBoard = fenToBoard(
-          newMessage.fen.split(" ")[0].split("/").reverse().join("/")
+          newMessage.fen.split(" ")[0].split("/").reverse().join("/"),
         );
 
         console.log(newBoard);
@@ -132,9 +132,8 @@ export default function Test() {
           {board && (
             <Board
               board={board}
-              className={`rounded-2xl relative overflow-hidden border-4 ${
-                turn === "white" ? "border-white" : "border-black"
-              }`}
+              className={`rounded-2xl relative overflow-hidden border-4 ${turn === "white" ? "border-white" : "border-black"
+                }`}
             />
           )}
         </div>

@@ -16,8 +16,8 @@ interface FormInputs {
 
 export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
-  const [passwordIsValid, setPasswordIsValid] = useState(true)
-  const [usernameIsValid, setUsernameIsValid] = useState(true)
+  const [passwordIsValid, setPasswordIsValid] = useState(true);
+  const [usernameIsValid, setUsernameIsValid] = useState(true);
 
   const router = useRouter();
 
@@ -27,8 +27,8 @@ export default function Login() {
   const loginHandler = async (data: FormInputs) => {
     setIsLoading(true);
     if (!inputCheck(data.username, data.password)) {
-      setIsLoading(false)
-      return
+      setIsLoading(false);
+      return;
     }
     login(data.username, data.password);
   };
@@ -37,17 +37,17 @@ export default function Login() {
     let valid = true;
     if (username.length < 3) {
       setUsernameIsValid(false);
-      valid = false
+      valid = false;
     }
     if (password.length < 3) {
-      setPasswordIsValid(false)
-      valid = false
+      setPasswordIsValid(false);
+      valid = false;
     }
     return valid;
-  }
+  };
   const login = async (username: string, password: string) => {
     axios
-      .post("http://127.0.0.1:8000/api/register/", {
+      .post(`http://${process.env.NEXT_PUBLIC_SERVER}/api/register/`, {
         username: username,
         password: password,
       })
@@ -61,16 +61,20 @@ export default function Login() {
       .catch(function(error) {
         console.log(error);
         toast.error(`Wrong username or password. 
-                      Please try again!`)
+                      Please try again!`);
       });
   };
   return (
     <Container>
       <div className="flex flex-col">
-        <div className="flex flex-row justify-center mt-12">
-          <div className="rounded-lg p-5 bg-gray-900 shadow-2xl ">
+        <div className="mt-12 flex flex-row justify-center">
+          <div className="rounded-lg bg-gray-900 p-5 shadow-2xl ">
             <form onSubmit={handleSubmit(onSubmit)} className="">
-              {!usernameIsValid && <span className="text-sm text-red-500">Username must be at least 3 characters</span>}
+              {!usernameIsValid && (
+                <span className="text-sm text-red-500">
+                  Username must be at least 3 characters
+                </span>
+              )}
               <FormInput
                 register={register("username", { required: true })}
                 type="username"
@@ -78,25 +82,28 @@ export default function Login() {
                 className=""
               />
               <div className="mt-2">
-                {!passwordIsValid && <span className="text-sm text-red-500">password must be at least 3 characters</span>}
+                {!passwordIsValid && (
+                  <span className="text-sm text-red-500">
+                    password must be at least 3 characters
+                  </span>
+                )}
                 <FormInput
                   register={register("password", { required: true })}
                   type="password"
                   placeholder="Password"
                 />
               </div>
-              <div className="border-b-2 border-gray-600 pb-6 flex flex-row justify-center mt-2">
+              <div className="mt-2 flex flex-row justify-center border-b-2 border-gray-600 pb-6">
                 <button
                   type="submit"
-                  className="bg-blue-500 w-full text-2xl text-white rounded-lg sm:text-3xl sm:py-2"
+                  className="w-full rounded-lg bg-blue-500 text-2xl text-white sm:py-2 sm:text-3xl"
                 >
                   Create Account
                 </button>
               </div>
-              <Link href='/login'>
-                <div className=" mt-6 justify-center flex flex-row ">
-                  <button className="hover:bg-green-700 bg-green-600 w-1/2 text-2xl text-white rounded-lg sm:text-3xl sm:py-2"
-                  >
+              <Link href="/login">
+                <div className=" mt-6 flex flex-row justify-center ">
+                  <button className="w-1/2 rounded-lg bg-green-600 text-2xl text-white hover:bg-green-700 sm:py-2 sm:text-3xl">
                     Login
                   </button>
                 </div>

@@ -64,13 +64,15 @@ export default function Game({ gameId, gameType }: ChessGame) {
   const [win, setWin] = useState<"white" | "black" | "none">("none");
   useEffect(() => {
     // Initialize WebSocket connection
+    console.log(process.env.NEXT_PUBLIC_SERVER);
     if (gameId && user?.id) {
       var ws = new WebSocket(
-        `ws://127.0.0.1:8000/chessGame/?chessGameId=${gameId}&userId=${user?.id}`,
+        `ws://${process.env.NEXT_PUBLIC_SERVER}/chessGame/?chessGameId=${gameId}&userId=${user?.id}`,
       );
     } else {
       var ws = new WebSocket(
-        `ws://127.0.0.1:8000/chessGame/?chessGameId=${""}&userId=${user?.id}`,
+        `ws://${process.env.NEXT_PUBLIC_SERVER
+        }/chessGame/?chessGameId=${""}&userId=${user?.id}`,
       );
     }
     setWebSocket(ws);

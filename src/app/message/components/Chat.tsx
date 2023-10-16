@@ -15,7 +15,9 @@ export default function Chat({ receiverID }: Props) {
 
   useEffect(() => {
     // Initialize WebSocket connection
-    const ws = new WebSocket(`ws://127.0.0.1:8000/chat/?chatId=${chat?.id}`);
+    const ws = new WebSocket(
+      `ws://${process.env.NEXT_PUBLIC_SERVER}/chat/?chatId=${chat?.id}`,
+    );
     setWebSocket(ws);
 
     return () => {
@@ -54,9 +56,12 @@ export default function Chat({ receiverID }: Props) {
   useEffect(() => {
     const fetchChat = async () => {
       axios
-        .get("http://127.0.0.1:8000/api/find_chat_by_participants/", {
-          params: { participant1_id: receiverID, participant2_id: userID },
-        })
+        .get(
+          `http://${process.env.NEXT_PUBLIC_SERVER}/api/find_chat_by_participants/`,
+          {
+            params: { participant1_id: receiverID, participant2_id: userID },
+          },
+        )
         .then((response) => {
           setChat(response.data.chat);
         })
@@ -73,7 +78,7 @@ export default function Chat({ receiverID }: Props) {
               participants: [userID, receiverID], // Replace with actual user IDs
             };
             axios
-              .post("http://127.0.0.1:8000/api/chats/", data)
+              .post(`http://${process.env.NEXT_PUBLIC_SERVER}/api/chats/`, data)
               .then((response) => {
                 setChat(response.data);
               });

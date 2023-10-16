@@ -29,7 +29,7 @@ export default function Login() {
 
   const login = async (username: string, password: string) => {
     axios
-      .post("http://127.0.0.1:8000/api/login/", {
+      .post(`http://${process.env.NEXT_PUBLIC_SERVER}/api/login/`, {
         username: username,
         password: password,
       })
@@ -45,17 +45,17 @@ export default function Login() {
         router.push("/");
       })
       .catch(function(error) {
-        setIsLoading(false)
+        setIsLoading(false);
         console.log(error);
         toast.error(`Wrong username or password. 
-                      Please try again!`)
+                      Please try again!`);
       });
   };
   return (
     <Container>
       <div className="flex flex-col">
-        <div className="flex flex-row justify-center mt-12">
-          <div className="rounded-lg p-5 bg-gray-900 shadow-2xl ">
+        <div className="mt-12 flex flex-row justify-center">
+          <div className="rounded-lg bg-gray-900 p-5 shadow-2xl ">
             <form onSubmit={handleSubmit(onSubmit)} className="">
               <FormInput
                 register={register("username", { required: true })}
@@ -70,26 +70,26 @@ export default function Login() {
                   placeholder="Password"
                 />
               </div>
-              <div className="border-b-2 border-gray-600 pb-6 flex flex-row justify-center mt-2">
-                {!isLoading && (<button
-                  type="submit"
-                  className="bg-blue-500 w-full text-2xl text-white rounded-lg sm:text-3xl sm:py-2"
-                >
-                  Login
-                </button>)}
-                {isLoading && (<div
-                  className="bg-blue-500 w-full text-2xl text-white rounded-lg sm:text-3xl sm:py-2"
-                >
-                  <div className="flex flex-row justify-center">
-                    <LoadingSpinner size={40} />
-
-                  </div>
-                </div>)}
-              </div>
-              <Link href='/signin'>
-                <div className=" mt-6 justify-center flex flex-row ">
-                  <button className="hover:bg-green-700 bg-green-600 w-1/2 text-2xl text-white rounded-lg sm:text-3xl sm:py-2"
+              <div className="mt-2 flex flex-row justify-center border-b-2 border-gray-600 pb-6">
+                {!isLoading && (
+                  <button
+                    type="submit"
+                    className="w-full rounded-lg bg-blue-500 text-2xl text-white sm:py-2 sm:text-3xl"
                   >
+                    Login
+                  </button>
+                )}
+                {isLoading && (
+                  <div className="w-full rounded-lg bg-blue-500 text-2xl text-white sm:py-2 sm:text-3xl">
+                    <div className="flex flex-row justify-center">
+                      <LoadingSpinner size={40} />
+                    </div>
+                  </div>
+                )}
+              </div>
+              <Link href="/signin">
+                <div className=" mt-6 flex flex-row justify-center ">
+                  <button className="w-1/2 rounded-lg bg-green-600 text-2xl text-white hover:bg-green-700 sm:py-2 sm:text-3xl">
                     Sign Up
                   </button>
                 </div>
