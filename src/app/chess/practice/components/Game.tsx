@@ -15,6 +15,7 @@ import BoardSetting from "./BoardSetting";
 import { Chesspiece } from "@/components/chess/ChessPiece";
 import DeadPieces from "./DeadPieces";
 import { PieceColor } from "@/components/chess/ChessBoard";
+import axios from "axios";
 
 const idToLocation = (id: UniqueIdentifier): BoardPosition => {
   // get coordinates for the board
@@ -48,6 +49,14 @@ export default function Game() {
     const test = new ChessBoard();
     setChessBoard(test);
     setBoard(test.board);
+    axios
+      .get(`http://${process.env.NEXT_PUBLIC_SERVER}/api/test/`)
+      .then(function(response) {
+        console.log(response.data.message);
+      })
+      .catch(function(error) {
+        console.log(error);
+      });
   }, []);
 
   useEffect(() => {

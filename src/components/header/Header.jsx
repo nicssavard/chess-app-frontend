@@ -45,8 +45,9 @@ export default function Header() {
         .catch((error) => {
           console.log(error.response);
           // Handle errors
-          if (error.response.status === 401) {
-          }
+          // if (error.response.status === 401) {
+          //   console.log("error");
+          // }
 
           console.log("Error:", error);
         });
