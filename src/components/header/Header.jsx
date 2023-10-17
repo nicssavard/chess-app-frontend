@@ -118,9 +118,13 @@ export default function Header() {
               <ListItem href="/chess/practice" title="Practice">
                 Practice chess by yourself
               </ListItem>
-              <ListItem href="https://icons.radix-ui.com/" title="Icons">
+              <div
+                onClick={() => console.log(process.env.NEXT_PUBLIC_SERVER)}
+                // href="https://icons.radix-ui.com/"
+                title="Icons"
+              >
                 A crisp set of 15x15 icons, balanced and consistent.
-              </ListItem>
+              </div>
             </ul>
           </NavigationMenu.Content>
         </NavigationMenu.Item>
