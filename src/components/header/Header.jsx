@@ -119,7 +119,12 @@ export default function Header() {
                 Practice chess by yourself
               </ListItem>
               <div
-                onClick={() => console.log(process.env.NEXT_PUBLIC_SERVER)}
+                onClick={() =>
+                  console.log(
+                    process.env.NEXT_PUBLIC_SERVER,
+                    process.env.NEXT_PUBLIC_SERVER_WS,
+                  )
+                }
                 // href="https://icons.radix-ui.com/"
                 title="Icons"
               >

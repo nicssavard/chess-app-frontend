@@ -5,6 +5,7 @@ import { DndContext, DragEndEvent, UniqueIdentifier } from "@dnd-kit/core";
 import Board from "./Board";
 import { ChessPosition } from "../../../../typings";
 import useStore from "@/store/userStore";
+import Waiting from "./Waiting";
 
 const idToLocation = (id: UniqueIdentifier): ChessPosition => {
   // get coordinates for the board
@@ -49,11 +50,8 @@ const moveVerification = (
   return true;
 };
 
-interface ChessGame {
-  gameId?: number;
-  gameType: "random" | "bot" | "friend";
-}
-export default function Game({ gameId, gameType }: ChessGame) {
+export default function Game() {
+  const [isWaiting, setIsWaiting] = useState(false);
   const { user } = useStore((state) => ({ user: state.user }));
   const [webSocket, setWebSocket] = useState<WebSocket | null>(null);
   const [board, setBoard] = useState<string[][] | null>(null);
@@ -64,23 +62,15 @@ export default function Game({ gameId, gameType }: ChessGame) {
   const [win, setWin] = useState<"white" | "black" | "none">("none");
   useEffect(() => {
     // Initialize WebSocket connection
-    console.log(process.env.NEXT_PUBLIC_SERVER);
-    if (gameId && user?.id) {
-      var ws = new WebSocket(
-        `${process.env.NEXT_PUBLIC_SERVER_WS}/chessGame/?chessGameId=${gameId}&userId=${user?.id}`,
-      );
-    } else {
-      var ws = new WebSocket(
-        `${process.env.NEXT_PUBLIC_SERVER_WS
-        }/chessGame/?chessGameId=${""}&userId=${user?.id}`,
-      );
-    }
+    var ws = new WebSocket(
+      `${process.env.NEXT_PUBLIC_SERVER_WS}/chessGame/?userId=${user?.id}`,
+    );
     setWebSocket(ws);
 
     return () => {
       ws.close();
     };
-  }, [gameId, user?.id]);
+  }, [user?.id]);
 
   useEffect(() => {
     if (webSocket) {
@@ -90,8 +80,17 @@ export default function Game({ gameId, gameType }: ChessGame) {
 
       webSocket.onmessage = (e) => {
         const newMessage = JSON.parse(e.data);
+        console.log(newMessage);
         let board = newMessage;
         let newBoard;
+        if (newMessage.messageType === "WAITING_FOR_OPPONENT") {
+          console.log("waiting");
+          setIsWaiting(true);
+          return;
+        }
+        if (newMessage.messageType === "GAME_STARTED") {
+          setIsWaiting(false);
+        }
         if (newMessage.color) {
           board = JSON.parse(newMessage.board);
           // first message to set the color
@@ -142,7 +141,9 @@ export default function Game({ gameId, gameType }: ChessGame) {
     // }
     // setIsCheckMate(chessBoard.checkmate);
   };
-
+  if (isWaiting) {
+    return <Waiting />;
+  }
   return (
     <Container>
       <DndContext onDragEnd={handleDragEnd}>

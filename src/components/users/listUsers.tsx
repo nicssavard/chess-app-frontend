@@ -12,7 +12,7 @@ export default function ListUsers({ selectChat }: Props) {
 
   useEffect(() => {
     axios
-      .get("http://127.0.0.1:8000/api/users")
+      .get(`${process.env.NEXT_PUBLIC_SERVER}/api/users`)
       .then((response) => {
         // Process the response data
         setUsers(response.data);
@@ -29,15 +29,15 @@ export default function ListUsers({ selectChat }: Props) {
       <div
         key={user.id}
         onClick={() => selectChat(user)}
-        className="text-xl mb-1 hover:bg-slate-700 cursor-pointer"
+        className="mb-1 cursor-pointer text-xl hover:bg-slate-700"
       >
         {user.username}
       </div>
     );
   });
   return (
-    <div className="flex flex-col mr-10">
-      <div className="text-2xl mb-4 border-b-2">Chats</div>
+    <div className="mr-10 flex flex-col">
+      <div className="mb-4 border-b-2 text-2xl">Chats</div>
       {users && userList}
     </div>
   );
