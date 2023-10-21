@@ -1,5 +1,13 @@
 import { ChessPosition, Chessboard, Chesspiece } from "../../../typings";
-import { Pawn, Rook, Knight, Bishop, Queen, King } from "./ChessPiece";
+import {
+  Pawn,
+  Rook,
+  Knight,
+  Bishop,
+  Queen,
+  King,
+  Chesspiece as ChessP,
+} from "./ChessPiece";
 import BoardPosition from "./BoardPosition";
 import _ from "lodash";
 
@@ -45,6 +53,7 @@ export default class ChessBoard {
     let pieces = this.pieces;
     const fenBoard = fen.split(" ")[0];
     const fenRows = fenBoard.split("/");
+    //set up board
     for (let i = 0; i < fenRows.length; i++) {
       const row = fenRows[i];
       let x = 0;
@@ -66,31 +75,18 @@ export default class ChessBoard {
         }
       }
     }
-    for (let i = 0; i < pieces.length; i++) {
-      const letter = pieces[i];
-      const piece = this.createPieceFromFENLetter(
-        letter,
-        new BoardPosition(0, 0),
+    //set up dead pieces
+    pieces.split("").forEach((letter) => {
+      this.deadPieces.push(
+        this.createPieceFromFENLetter(letter, new BoardPosition(-1, -1)),
       );
-      this.deadPieces.push(piece!);
-    }
-
+    });
+    //set up game state
     this.turn = fen.split(" ")[1] === "w" ? PieceColor.White : PieceColor.Black;
     this.enPassant = fen.split(" ")[3];
     this.halfMoves = Number(fen.split(" ")[4]);
     this.fullMoves = Number(fen.split(" ")[5]);
-
-    const kings = this.alivePieces.filter(
-      (piece) => piece.getType() === "King",
-    );
-    kings.forEach((king) => {
-      if (king.getColor() === "w") {
-        this.wKing = king as King;
-      } else {
-        this.bKing = king as King;
-      }
-    });
-
+    //generate moves
     this.alivePieces.forEach((piece) => {
       piece.generateMoves();
     });
@@ -150,7 +146,7 @@ export default class ChessBoard {
     this.setPieceAt(start, null);
   }
 
-  getSquareCode(position: ChessPosition): string {
+  getSquareCode(position: BoardPosition): string {
     const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
     return `${letters[position.x]}${position.y + 1}`;
   }
@@ -385,7 +381,7 @@ export default class ChessBoard {
   public createPieceFromFENLetter(
     letter: string,
     boardPosition: BoardPosition = new BoardPosition(0, 0),
-  ): Chesspiece | null {
+  ): Chesspiece {
     const color =
       letter === letter.toUpperCase() ? PieceColor.White : PieceColor.Black;
     switch (letter.toLowerCase()) {
@@ -408,7 +404,7 @@ export default class ChessBoard {
           return this.bKing;
         }
       default:
-        return null;
+        return new ChessP(color, boardPosition, this, "");
     }
   }
 
