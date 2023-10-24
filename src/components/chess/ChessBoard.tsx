@@ -87,9 +87,6 @@ export default class ChessBoard {
     this.halfMoves = Number(fen.split(" ")[4]);
     this.fullMoves = Number(fen.split(" ")[5]);
     //generate moves
-    this.alivePieces.forEach((piece) => {
-      piece.generateMoves();
-    });
     this.generatePossibleMovesAndAttacks();
   }
 
@@ -358,6 +355,7 @@ export default class ChessBoard {
     piece: Chesspiece,
     moveType: string,
   ): void {
+    const dir = piece.getColor() === PieceColor.White ? 1 : -1;
     this.halfMoves += 1;
     if (this.turn === PieceColor.Black) {
       this.fullMoves += 1;
@@ -369,11 +367,7 @@ export default class ChessBoard {
     } else if (piece.getType() === "Pawn") {
       this.halfMoves = 0;
       if (Math.abs(start.y - end.y) === 2) {
-        if (piece.getColor() === PieceColor.White) {
-          this.enPassant = start.add(0, 1).toChessNotation();
-        } else {
-          this.enPassant = start.add(0, -1).toChessNotation();
-        }
+        this.enPassant = start.add(0, dir).toChessNotation();
       }
     }
   }

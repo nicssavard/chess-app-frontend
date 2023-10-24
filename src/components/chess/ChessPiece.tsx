@@ -36,7 +36,6 @@ export class Chesspiece {
   public generateMoves() { }
 
   public generateMovesLine(directions: BoardPosition[], length: number = 8) {
-    this.clearMoves();
     directions.forEach((dir) => {
       let d = 1;
       while (d <= length) {
@@ -136,7 +135,6 @@ export class Chesspiece {
     this.hasMoved = true;
     this.getBoard().killPiece(end);
     this.getBoard().movePiece(this, end);
-    this.getBoard().halfMoves = 0;
     return;
   }
   public isInMoves(end: BoardPosition) {
@@ -153,11 +151,6 @@ export class Pawn extends Chesspiece {
     super(color, position, board, "Pawn");
   }
 
-  public move(end: BoardPosition) {
-    const start = this.getPosition();
-    super.move(end);
-    return;
-  }
   public attack(end: BoardPosition) {
     if (this.getBoard().enPassant === end.toChessNotation()) {
       this.getBoard().killPiece(
@@ -193,6 +186,7 @@ export class Pawn extends Chesspiece {
   private canMoveStraight(end: BoardPosition): boolean {
     if (this.getPosition().x !== end.x) return false; //check if pawn is moving sideways
     if (this.getBoard().getPiece(end)) return false; //check if there is a piece in the way
+    const dir = this.getColor() === PieceColor.White ? 1 : -1;
 
     if (this.getColor() === PieceColor.White) {
       if (this.getPosition().y === 1 && end.y === 3) {
@@ -218,10 +212,8 @@ export class Pawn extends Chesspiece {
   }
   public canAttack(end: BoardPosition): boolean {
     if (!end.isOnBoard()) return false;
-    if (
-      this.getBoard().getPiece(end) &&
-      this.getColor() != this.getBoard().getPiece(end)?.getColor()
-    ) {
+    const pieceAttacked = this.getBoard().getPiece(end);
+    if (pieceAttacked && this.getColor() != pieceAttacked.getColor()) {
       this.addAttack(end);
       return true;
     }
@@ -242,15 +234,8 @@ export class Rook extends Chesspiece {
     super(color, position, board, "Rook");
   }
 
-  public move(end: BoardPosition): void {
-    this.hasMoved = true;
-    super.move(end);
-  }
-  public attack(end: BoardPosition): void {
-    this.hasMoved = true;
-    super.attack(end);
-  }
   public generateMoves() {
+    this.clearMoves();
     const directions = [
       new BoardPosition(0, 1),
       new BoardPosition(0, -1),
@@ -300,6 +285,7 @@ export class Bishop extends Chesspiece {
     super(color, position, board, "Bishop");
   }
   public generateMoves() {
+    this.clearMoves();
     const directions = [
       new BoardPosition(1, 1),
       new BoardPosition(1, -1),
@@ -316,6 +302,7 @@ export class Queen extends Chesspiece {
     super(color, position, board, "Queen");
   }
   public generateMoves() {
+    this.clearMoves();
     const directions = [
       new BoardPosition(0, 1),
       new BoardPosition(0, -1),
@@ -364,14 +351,11 @@ export class King extends Chesspiece {
       }
     }
 
-    this.hasMoved = true;
     super.move(end);
   }
-  public attack(end: BoardPosition): void {
-    this.hasMoved = true;
-    super.attack(end);
-  }
+
   public generateMoves() {
+    this.clearMoves();
     const directions = [
       new BoardPosition(0, 1),
       new BoardPosition(0, -1),
