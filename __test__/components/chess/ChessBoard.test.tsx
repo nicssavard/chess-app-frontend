@@ -146,7 +146,6 @@ describe("ChessBoard", () => {
     expect(
       chessBoard.isThreatened(new BoardPosition(4, 0), PieceColor.Black),
     ).toBe(false);
-    chessBoard.generatePossibleMovesAndAttacks();
     expect(
       chessBoard.isThreatened(new BoardPosition(3, 0), PieceColor.Black),
     ).toBe(true);

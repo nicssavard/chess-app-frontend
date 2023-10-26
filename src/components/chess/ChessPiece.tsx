@@ -60,7 +60,7 @@ export class Chesspiece {
   }
   protected lineClear(start: BoardPosition, end: BoardPosition) {
     const dir = this.moveDirection(start, end);
-    const length = Math.abs(end.x - start.x) || Math.abs(end.y - start.y);
+    const length = Math.abs(end.x - start.x);
     for (let i = 1; i < length; i++) {
       if (
         this.board.getPiece(
@@ -323,34 +323,21 @@ export class King extends Chesspiece {
     super(color, position, board, "King");
   }
   public move(end: BoardPosition): void {
-    if (Math.abs(this.getPosition().x - end.x) === 2) {
-      if (this.getColor() === PieceColor.White) {
-        if (end.x === 6) {
-          this.getBoard().movePiece(
-            this.getBoard().getPiece(new BoardPosition(7, 0))!,
-            new BoardPosition(5, 0),
-          );
-        } else if (end.x === 2) {
-          this.getBoard().movePiece(
-            this.getBoard().getPiece(new BoardPosition(0, 0))!,
-            new BoardPosition(3, 0),
-          );
-        }
-      } else {
-        if (end.x === 6) {
-          this.getBoard().movePiece(
-            this.getBoard().getPiece(new BoardPosition(7, 7))!,
-            new BoardPosition(5, 7),
-          );
-        } else if (end.x === 2) {
-          this.getBoard().movePiece(
-            this.getBoard().getPiece(new BoardPosition(0, 7))!,
-            new BoardPosition(3, 7),
-          );
-        }
-      }
+    if (Math.abs(this.getPosition().x - end.x) > 1) {
+      const rook = this.getBoard().getPiece(
+        new BoardPosition(
+          end.x > this.getPosition().x ? 7 : 0,
+          this.getPosition().y,
+        ),
+      ) as Rook;
+      this.getBoard().movePiece(
+        rook,
+        new BoardPosition(
+          end.x > this.getPosition().x ? 5 : 3,
+          this.getPosition().y,
+        ),
+      );
     }
-
     super.move(end);
   }
 
@@ -367,6 +354,7 @@ export class King extends Chesspiece {
       new BoardPosition(-1, -1),
     ];
     this.generateMovesLine(directions, 1);
+    this.generateCastlingMoves();
   }
   generateCastlingMoves() {
     if (this.hasMoved) return;

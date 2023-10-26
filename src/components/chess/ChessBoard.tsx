@@ -167,19 +167,8 @@ export default class ChessBoard {
     });
     this.possibleMoves = this.whiteMoves.concat(this.blackMoves);
     this.possibleAttacks = this.whiteAttacks.concat(this.blackAttacks);
-    this.generateCastlingMoves();
   }
 
-  generateCastlingMoves(): void {
-    this.wKing.generateCastlingMoves();
-    this.bKing.generateCastlingMoves();
-    this.whiteMoves.push(...this.wKing.getMoves());
-    this.whiteAttacks.push(...this.wKing.getAttacks());
-    this.blackMoves.push(...this.bKing.getMoves());
-    this.blackAttacks.push(...this.bKing.getAttacks());
-    this.possibleMoves = this.whiteMoves.concat(this.blackMoves);
-    this.possibleAttacks = this.whiteAttacks.concat(this.blackAttacks);
-  }
   getPossibleMoves(color: PieceColor | null = null): BoardPosition[] {
     if (color === PieceColor.White) {
       return this.whiteMoves;
@@ -249,7 +238,6 @@ export default class ChessBoard {
     return this.check;
   };
   public isThreatened(position: BoardPosition, color: PieceColor): boolean {
-    const moves = this.getPossibleMoves();
     let isThreatened =
       this.getPossibleAttacks(color).some((attack) => {
         return attack.equals(position);
